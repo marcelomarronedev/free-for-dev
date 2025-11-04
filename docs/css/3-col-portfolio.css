@@ -6,6 +6,8 @@ body {
 	margin-bottom: 25px;
 }
 
+.portfolio-item p a { font-size:17px; }
+
 footer {
 	margin: 50px 0;
 }
@@ -25,3 +27,4 @@ footer {
   color: #666;
   font-style: italic;
 }
+
