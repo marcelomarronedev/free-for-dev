@@ -1,0 +1,17 @@
+# Node modules
+node_modules/
+
+# TypeScript output
+dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# VSCode
+.vscode/
+
+# Sistema
+.DS_Store
+Thumbs.db

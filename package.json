@@ -1,0 +1,27 @@
+{
+  "name": "aggrhome",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+  "clean": "rimraf public/dist",
+  "build": "npm run clean && tsc",
+  "serve": "live-server public --port=5500",
+  "start": "npm run build && npm run serve"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/bootstrap": "^5.2.10",
+    "@types/jquery": "^3.5.33",
+    "live-server": "^1.2.2",
+    "rimraf": "^6.1.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.8",
+    "jquery": "^3.7.1"
+  }
+}

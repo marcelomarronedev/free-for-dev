@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "ESNext",            // ← clave para navegador
+    "moduleResolution": "Node",    // permite imports de Node
+    "esModuleInterop": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./public/dist",
+    "rootDir": "./src",
+    "lib": ["DOM", "ES2017"],
+  },
+  "include": ["src"]
+}

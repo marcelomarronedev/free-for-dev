@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='25' font-size='25'>🌐</text></svg>">
+
+
+    <title>AGGRHOME - Portada de los principales agregadores de noticias en español</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom CSS for the '3 Col Portfolio' Template -->
+    <link href="css/3-col-portfolio.css" rel="stylesheet">
+
+    <!-- jQuery (debe ir antes que bootstrap.js) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+  </head>
+
+  <body>
+
+<nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+  <div class="container">
+<div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">AGGRHOME 🌐</a>
+        </div>
+
+<div class="collapse navbar-collapse navbar-ex1-collapse">
+  <ul class="nav navbar-nav">
+    <li><a href="#about">Sobre el proyecto</a></li>
+    <li><a target="_blank" href="https://github.com/enterum/aggrhome">Github</a></li>
+    <li><a href="mailto:enterum0@gmail.com">Contacto</a></li>
+  </ul>
+
+  <form class="navbar-form navbar-right" role="form">
+    <div class="form-group">
+      <select id="refreshSelect" class="form-control input-sm">
+        <option value="0">No refrescar nunca</option>
+        <option value="60000">Refrescar cada minuto</option>
+        <option value="300000" selected>Refrescar cada 5 minutos</option>
+        <option value="600000">Refrescar cada 10 minutos</option>
+        <option value="1800000">Refrescar cada 30 minutos</option>
+      </select>
+    </div>
+  </form>
+</div><!-- /.navbar-collapse -->
+
+
+
+
+  </div>
+</nav>
+
+<div class="container mobile-margin-top">
+  <h1 class="page-header">
+    AGGRHOME<small> 🌐 Portadas de los principales agregadores de noticias en español</small>
+  </h1>
+
+  <div id="feeds-container"></div>
+</div>
+
+<hr>
+<a name="about"></a>
+<h2 style="text-align: center;">Sobre el proyecto</h2>
+<div class="container" id="readme"></div>
+
+<!-- marked.js (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script>
+  async function loadReadme() {
+    try {
+      const response = await fetch('README.md');
+      if (!response.ok) throw new Error('No se pudo cargar el README');
+      const markdown = await response.text();
+      
+      // Renderiza el markdown a HTML
+      const html = marked.parse(markdown);
+      
+      // Inserta en el div
+      document.getElementById('readme').innerHTML = html;
+    } catch (error) {
+      console.error(error);
+      document.getElementById('readme').innerHTML = "<p>Error cargando README.md</p>";
+    }
+  }
+
+  loadReadme();
+</script>
+
+
+      <hr>
+
+    <div class="container">
+
+
+      <footer>
+        <div class="row">
+          <div class="col-lg-12">
+            <p>&copy; AGGRHOME <span id="getCurrentDate"></span> 
+              - Plantilla HTML por <a target="_blank" href="https://github.com/learning-zone/website-templates/tree/master/3-col-portfolio">3-col-portfolio</a>
+              - Proxy CORS por <a target="_blank" href="https://corsproxy.io/">corsproxy.io</a>
+            </p>
+          </div>
+        </div>
+      </footer>
+      
+    </div><!-- /.container -->
+
+    <!-- JavaScript -->
+   <script type="module" src="dist/main.js"></script>
+  </body>
+
+</html>
