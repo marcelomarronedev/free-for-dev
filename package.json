@@ -7,8 +7,7 @@
     "clean": "rimraf docs/dist",
     "build": "npm run clean && tsc",
     "serve": "live-server docs --port=5500",
-    "start": "npm run build && npm run serve",
-    "deploy": "npm run build && git add docs && git commit -m 'Deploy to GitHub Pages' || echo 'No changes to commit' && git push"
+    "start": "npm run build && npm run serve"
   },
   "keywords": [],
   "author": "Enterum",
