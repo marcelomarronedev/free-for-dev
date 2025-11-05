@@ -260,7 +260,9 @@ function loadFeeds() {
                             historyContainer.appendChild(table);
                             historyContainer.style.display = "block";
                             // Hacer scroll hacia el historial
-                            //historyContainer.scrollIntoView({ behavior: "smooth" });
+                            const rect = historyContainer.getBoundingClientRect();
+                            const scrollTop = window.scrollY + rect.top - 100;
+                            window.scrollTo({ top: scrollTop, behavior: "smooth" });
                         }
                         catch (err) {
                             console.error("Error mostrando historial:", err);
