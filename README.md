@@ -9,10 +9,10 @@ Desplegado en vivo: https://enterum.github.io/aggrhome/
 ## Funcionalidades
 
 - Lectura de feeds RSS de distintos agregadores de noticias como:
-  - [Menéame](https://www.meneame.net)
-  - [KillBait](https://killbait.com)
-  - [Tardigram](https://tardigram.com)
-  - [Mediatize](https://www.mediatize.info)
+  - <a href="https://www.meneame.net" target="_blank">Menéame</a>
+  - <a href="https://killbait.com" target="_blank">KillBait</a>
+  - <a href="https://tardigram.com" target="_blank">Tardigram</a>
+  - <a href="https://www.mediatize.info" target="_blank">Mediatize</a>
   - ...
 - Visualización del título, enlace e imagen de la primera noticia de cada feed.
 - Selección de intervalo de actualización automática desde la barra de navegación (Nunca, 1 minuto, 5 minutos, 10 minutos, 30 minutos).  
