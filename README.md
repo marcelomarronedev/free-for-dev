@@ -47,6 +47,7 @@ AGGRHOME/
 
 ## Registro de cambios importantes
 
+- 2025-11-06 - Se añade la funcionalidad de comentar cada agregador con [utteranc.es](https://utteranc.es).
 - 2025-11-06 - Se añade la funcionalidad de compartir noticias mediante Web Share API.
 - 2025-11-05 - Se añade histórico de noticias por cada feed: Al ser un proyecto sin backend, el historial se guarda en el localStorage del navegador. Eso quiere decir que solo aparecerán en el historial las noticias que hayan ido apareciendo por cada feed mientras la aplicación se ha estado ejecutando en el navegador del usuario.
 - 2025-11-04 - Versión inicial.

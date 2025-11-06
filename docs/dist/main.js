@@ -217,6 +217,46 @@ function loadFeeds() {
                     if (pubDateEl)
                         pubDateEl.textContent = feedItem.pubDate;
                 });
+                // Dentro del forEach donde ya tienes container definido
+                const commentsToggle = document.createElement("a");
+                commentsToggle.href = "#";
+                commentsToggle.textContent = "Comentarios sobre este agregador";
+                commentsToggle.style.display = "inline-block";
+                commentsToggle.style.marginTop = "10px";
+                commentsToggle.style.cursor = "pointer";
+                // Div para comentarios, inicialmente oculto
+                const commentsDiv = document.createElement("div");
+                commentsDiv.style.display = "none";
+                commentsDiv.style.height = "300px"; // altura fija
+                commentsDiv.style.overflowY = "auto"; // scroll vertical
+                commentsDiv.style.marginTop = "10px";
+                commentsDiv.style.border = "1px solid #ccc";
+                commentsDiv.style.padding = "10px";
+                commentsDiv.style.borderRadius = "8px";
+                // Toggle para mostrar/ocultar comentarios
+                commentsToggle.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    if (commentsDiv.style.display === "none") {
+                        commentsDiv.style.display = "block";
+                        // Solo insertar Utterances la primera vez
+                        if (!commentsDiv.hasChildNodes()) {
+                            const script = document.createElement("script");
+                            script.src = "https://utteranc.es/client.js";
+                            script.async = true;
+                            script.setAttribute("repo", "enterum/feeds-comments"); // tu repo
+                            script.setAttribute("issue-term", `${feed.title}`);
+                            script.setAttribute("theme", "github-light");
+                            script.setAttribute("crossorigin", "anonymous");
+                            commentsDiv.appendChild(script);
+                        }
+                    }
+                    else {
+                        commentsDiv.style.display = "none";
+                    }
+                });
+                // Añadir al feed
+                container.appendChild(commentsToggle);
+                container.appendChild(commentsDiv);
                 // Nueva funcionalidad 05/11/2025: Mostrar histórico:
                 const h3El = container.querySelector("h3");
                 if (h3El) {
