@@ -20,8 +20,8 @@ async function getFirstItem(feedUrl: string, useDescriptionForImage = false): Pr
 
     // Si recibimos 429 u otro error HTTP, ignoramos este feed
     if (!response.ok) {
-      if (response.status === 429) {
-        console.warn(`Feed ignorado por límite de peticiones: ${feedUrl}`);
+      if (response.status != 200) {
+        console.warn(`Feed ignorado por error ${response.status}: ${feedUrl}`);
         return null; // retornamos null para que no se renderice
       }
       throw new Error(`Error HTTP ${response.status}`);
