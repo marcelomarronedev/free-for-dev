@@ -200,7 +200,7 @@ async function loadFeeds() {
         colDiv.innerHTML = `
           <a target="_blank" href="#"><img class="img-responsive" src="#"></a>
           <h3>${feed.title}</h3>
-          <p><a target="_blank" href="##">Título</a></p>
+          <p><a target="_blank" href="##">...</a></p>
           <p class="pubdate"></p>
         `;
 
@@ -222,11 +222,18 @@ async function loadFeeds() {
 
     // Actualizar contenido de cada feed
     items.forEach((feedItem, index) => {
-      if (!feedItem) return;
-
-      const feed = feedsWithImages[index];
       const container = document.querySelector(`.portfolio-item[data-feed="${index}"]`);
       if (!container) return;
+
+      if (!feedItem)   // si la lectura del feed ha dado !=200 se elimina del div correspondiente para que no renderize
+      {
+        if (container && container.parentElement) {
+          container.parentElement.removeChild(container);
+        }
+        return; 
+      }
+
+      const feed = feedsWithImages[index];
 
       const linkEl = container.querySelector("a") as HTMLAnchorElement;
       const imgEl = container.querySelector("img") as HTMLImageElement;
