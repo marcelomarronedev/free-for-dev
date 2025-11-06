@@ -103,6 +103,19 @@ async function getFirstItem(feedUrl: string, useDescriptionForImage = false): Pr
             }
           }
 
+          //Validar imagen antes de guardar:
+          const esValida = await validarImagen(imageUrl);
+          if (!esValida) {
+            // Si no es válida, usar imagen por defecto (si existe)
+            const feedsTxt = await fetch("feeds.txt").then(res => res.text());
+            const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
+            const feedDefault = lines.find(line => line.includes(feedUrl));
+            if (feedDefault) {
+              const parts = feedDefault.split(",");
+              imageUrl = parts[2] || "";
+            }
+          }
+
           storedData.push({ host, title, link, imageUrl, pubDate });
           localStorage.setItem("feedsHistory", JSON.stringify(storedData));
         }
@@ -208,6 +221,7 @@ async function loadFeeds() {
       const pubDateEl = container.querySelector("p.pubdate") as HTMLParagraphElement;
 
       let finalImage = feedsWithImages[index].defaultImage;
+
 
       validarImagen(feedItem.imageUrl).then(esValida => {
         finalImage = esValida
@@ -330,8 +344,124 @@ async function loadFeeds() {
     if (loading) loading.style.display = "none";
     container.style.display = "block";
 
+    saveHistorial(true, 5);
+
   } catch (error) {
     console.error("Error leyendo feeds.txt o actualizando DOM:", error);
+  }
+}
+
+
+async function saveHistorial(useDescriptionForImage = false, maxConcurrent = 5) {
+  try {
+    const feedsTxt = await fetch("feeds.txt").then(res => res.text());
+    const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line && !line.startsWith("#"));
+
+    const feeds = lines.map(line => {
+      const parts = line.split(",");
+      return { title: parts[0]?.trim(), url: parts[1]?.trim(), defaultImage: parts[2]?.trim() || "" };
+    });
+
+    const storedDataJson = localStorage.getItem("feedsHistory");
+    let storedData: Array<{ link: string, host: string, title: string, imageUrl: string, pubDate: string }> =
+      storedDataJson ? JSON.parse(storedDataJson) : [];
+
+    // Pool de concurrencia
+    let active = 0;
+    let index = 0;
+
+    return new Promise<void>((resolve) => {
+      const next = async () => {
+        if (index >= feeds.length) {
+          if (active === 0) {
+            localStorage.setItem("feedsHistory", JSON.stringify(storedData));
+            resolve();
+          }
+          return;
+        }
+
+        while (active < maxConcurrent && index < feeds.length) {
+          const feed = feeds[index++];
+          active++;
+
+          (async () => {
+            try {
+              const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(feed.url)}`);
+              const xmlText = await response.text();
+              const parser = new DOMParser();
+              const xml = parser.parseFromString(xmlText, "application/xml");
+              const isAtom = feed.url.includes("reddit.com");
+              const items = isAtom ? Array.from(xml.querySelectorAll("entry")) : Array.from(xml.querySelectorAll("item"));
+
+              for (const item of items) {
+                const title = item.querySelector("title")?.textContent ?? "";
+
+                let link = "";
+                if (isAtom)
+                  link = item.querySelector("link")?.getAttribute("href") ?? "";
+                else
+                  link = item.querySelector("link")?.textContent ?? "";
+
+                if (!link) continue;
+
+                // Imagen
+                let imageUrl = "";
+                if (isAtom) {
+                  const content = item.querySelector("content")?.textContent ?? "";
+                  const imgMatch = content.match(/<img[^>]+src=['"]([^'"]+)['"]/);
+                  if (imgMatch) imageUrl = imgMatch[1];
+                } else {
+                  const media = item.querySelector("media\\:content, enclosure") as Element | null;
+                  if (media) imageUrl = media.getAttribute("url") ?? "";
+                }
+
+                if (!imageUrl && useDescriptionForImage) {
+                  const description = item.querySelector("description")?.textContent ?? "";
+                  const match = description.match(/<img[^>]+src=['"]([^'"]+)['"]/);
+                  if (match) imageUrl = match[1];
+                }
+
+                // Fecha
+                let pubDate = "";
+                if (isAtom) {
+                  const updatedRaw = item.querySelector("updated")?.textContent ?? "";
+                  if (updatedRaw) pubDate = formatDate(new Date(updatedRaw));
+                } else {
+                  const pubDateRaw = item.querySelector("pubDate")?.textContent ?? "";
+                  const pubDateObj = pubDateRaw ? new Date(pubDateRaw) : null;
+                  pubDate = pubDateObj ? formatDate(pubDateObj) : "";
+                }
+
+                try {
+                  const urlObj = new URL(link);
+                  const host = urlObj.host;
+
+                  const exists = storedData.some(i => i.link === link);
+                  if (exists) continue;
+
+                  // Validar imagen
+                  const esValida = await validarImagen(imageUrl);
+                  if (!esValida) imageUrl = feed.defaultImage || "";
+
+                  storedData.push({ host, title, link, imageUrl, pubDate });
+                } catch (err) {
+                  console.error("Error guardando item en localStorage:", err);
+                }
+              }
+            } catch (err) {
+              console.error("Error procesando feed:", feed.url, err);
+            } finally {
+              active--;
+              next(); // Lanza la siguiente tarea
+            }
+          })();
+        }
+      };
+
+      next();
+    });
+  } catch (err) {
+    console.error("Error general en saveHistorial:", err);
   }
 }
 

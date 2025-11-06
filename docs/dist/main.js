@@ -94,6 +94,18 @@ function getFirstItem(feedUrl_1) {
                                 imageUrl = parts[2] || ""; // la tercera columna es la imagen por defecto
                             }
                         }
+                        //Validar imagen antes de guardar:
+                        const esValida = yield validarImagen(imageUrl);
+                        if (!esValida) {
+                            // Si no es válida, usar imagen por defecto (si existe)
+                            const feedsTxt = yield fetch("feeds.txt").then(res => res.text());
+                            const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
+                            const feedDefault = lines.find(line => line.includes(feedUrl));
+                            if (feedDefault) {
+                                const parts = feedDefault.split(",");
+                                imageUrl = parts[2] || "";
+                            }
+                        }
                         storedData.push({ host, title, link, imageUrl, pubDate });
                         localStorage.setItem("feedsHistory", JSON.stringify(storedData));
                     }
@@ -280,9 +292,121 @@ function loadFeeds() {
             if (loading)
                 loading.style.display = "none";
             container.style.display = "block";
+            saveHistorial(true, 5);
         }
         catch (error) {
             console.error("Error leyendo feeds.txt o actualizando DOM:", error);
+        }
+    });
+}
+function saveHistorial() {
+    return __awaiter(this, arguments, void 0, function* (useDescriptionForImage = false, maxConcurrent = 5) {
+        try {
+            const feedsTxt = yield fetch("feeds.txt").then(res => res.text());
+            const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line && !line.startsWith("#"));
+            const feeds = lines.map(line => {
+                var _a, _b, _c;
+                const parts = line.split(",");
+                return { title: (_a = parts[0]) === null || _a === void 0 ? void 0 : _a.trim(), url: (_b = parts[1]) === null || _b === void 0 ? void 0 : _b.trim(), defaultImage: ((_c = parts[2]) === null || _c === void 0 ? void 0 : _c.trim()) || "" };
+            });
+            const storedDataJson = localStorage.getItem("feedsHistory");
+            let storedData = storedDataJson ? JSON.parse(storedDataJson) : [];
+            // Pool de concurrencia
+            let active = 0;
+            let index = 0;
+            return new Promise((resolve) => {
+                const next = () => __awaiter(this, void 0, void 0, function* () {
+                    if (index >= feeds.length) {
+                        if (active === 0) {
+                            localStorage.setItem("feedsHistory", JSON.stringify(storedData));
+                            resolve();
+                        }
+                        return;
+                    }
+                    while (active < maxConcurrent && index < feeds.length) {
+                        const feed = feeds[index++];
+                        active++;
+                        (() => __awaiter(this, void 0, void 0, function* () {
+                            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
+                            try {
+                                const response = yield fetch(`https://corsproxy.io/?${encodeURIComponent(feed.url)}`);
+                                const xmlText = yield response.text();
+                                const parser = new DOMParser();
+                                const xml = parser.parseFromString(xmlText, "application/xml");
+                                const isAtom = feed.url.includes("reddit.com");
+                                const items = isAtom ? Array.from(xml.querySelectorAll("entry")) : Array.from(xml.querySelectorAll("item"));
+                                for (const item of items) {
+                                    const title = (_b = (_a = item.querySelector("title")) === null || _a === void 0 ? void 0 : _a.textContent) !== null && _b !== void 0 ? _b : "";
+                                    let link = "";
+                                    if (isAtom)
+                                        link = (_d = (_c = item.querySelector("link")) === null || _c === void 0 ? void 0 : _c.getAttribute("href")) !== null && _d !== void 0 ? _d : "";
+                                    else
+                                        link = (_f = (_e = item.querySelector("link")) === null || _e === void 0 ? void 0 : _e.textContent) !== null && _f !== void 0 ? _f : "";
+                                    if (!link)
+                                        continue;
+                                    // Imagen
+                                    let imageUrl = "";
+                                    if (isAtom) {
+                                        const content = (_h = (_g = item.querySelector("content")) === null || _g === void 0 ? void 0 : _g.textContent) !== null && _h !== void 0 ? _h : "";
+                                        const imgMatch = content.match(/<img[^>]+src=['"]([^'"]+)['"]/);
+                                        if (imgMatch)
+                                            imageUrl = imgMatch[1];
+                                    }
+                                    else {
+                                        const media = item.querySelector("media\\:content, enclosure");
+                                        if (media)
+                                            imageUrl = (_j = media.getAttribute("url")) !== null && _j !== void 0 ? _j : "";
+                                    }
+                                    if (!imageUrl && useDescriptionForImage) {
+                                        const description = (_l = (_k = item.querySelector("description")) === null || _k === void 0 ? void 0 : _k.textContent) !== null && _l !== void 0 ? _l : "";
+                                        const match = description.match(/<img[^>]+src=['"]([^'"]+)['"]/);
+                                        if (match)
+                                            imageUrl = match[1];
+                                    }
+                                    // Fecha
+                                    let pubDate = "";
+                                    if (isAtom) {
+                                        const updatedRaw = (_o = (_m = item.querySelector("updated")) === null || _m === void 0 ? void 0 : _m.textContent) !== null && _o !== void 0 ? _o : "";
+                                        if (updatedRaw)
+                                            pubDate = formatDate(new Date(updatedRaw));
+                                    }
+                                    else {
+                                        const pubDateRaw = (_q = (_p = item.querySelector("pubDate")) === null || _p === void 0 ? void 0 : _p.textContent) !== null && _q !== void 0 ? _q : "";
+                                        const pubDateObj = pubDateRaw ? new Date(pubDateRaw) : null;
+                                        pubDate = pubDateObj ? formatDate(pubDateObj) : "";
+                                    }
+                                    try {
+                                        const urlObj = new URL(link);
+                                        const host = urlObj.host;
+                                        const exists = storedData.some(i => i.link === link);
+                                        if (exists)
+                                            continue;
+                                        // Validar imagen
+                                        const esValida = yield validarImagen(imageUrl);
+                                        if (!esValida)
+                                            imageUrl = feed.defaultImage || "";
+                                        storedData.push({ host, title, link, imageUrl, pubDate });
+                                    }
+                                    catch (err) {
+                                        console.error("Error guardando item en localStorage:", err);
+                                    }
+                                }
+                            }
+                            catch (err) {
+                                console.error("Error procesando feed:", feed.url, err);
+                            }
+                            finally {
+                                active--;
+                                next(); // Lanza la siguiente tarea
+                            }
+                        }))();
+                    }
+                });
+                next();
+            });
+        }
+        catch (err) {
+            console.error("Error general en saveHistorial:", err);
         }
     });
 }
