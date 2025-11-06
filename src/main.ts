@@ -13,7 +13,7 @@ function extractImageFromDescription(description: string): string {
 
 async function getFirstItem(feedUrl: string, useDescriptionForImage = false): Promise<FeedItem | null> {
   try {
-    const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(feedUrl)}`);
+    const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(feedUrl)}`, { cache: "no-store" });
     const xmlText = await response.text();
     const parser = new DOMParser();
     const xml = parser.parseFromString(xmlText, "application/xml");
@@ -94,7 +94,7 @@ async function getFirstItem(feedUrl: string, useDescriptionForImage = false): Pr
         if (!exists) {
 
           if (!imageUrl) {
-            const feedsTxt = await fetch("feeds.txt").then(res => res.text());
+            const feedsTxt = await fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
             const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
             const feedDefault = lines.find(line => line.includes(feedUrl));
             if (feedDefault) {
@@ -107,7 +107,7 @@ async function getFirstItem(feedUrl: string, useDescriptionForImage = false): Pr
           const esValida = await validarImagen(imageUrl);
           if (!esValida) {
             // Si no es válida, usar imagen por defecto (si existe)
-            const feedsTxt = await fetch("feeds.txt").then(res => res.text());
+            const feedsTxt = await fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
             const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
             const feedDefault = lines.find(line => line.includes(feedUrl));
             if (feedDefault) {
@@ -159,7 +159,7 @@ async function loadFeeds() {
     if (loading) loading.style.display = "block"; // mostrar spinner
     
     // Leer feeds.txt
-    const feedsTxt = await fetch("feeds.txt").then(res => res.text());
+    const feedsTxt = await fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
     const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
 
     // Mapear feeds a objetos { title, url, defaultImage }
@@ -383,7 +383,7 @@ if (!emojiShare) {
 
 async function saveHistorial(useDescriptionForImage = false, maxConcurrent = 5) {
   try {
-    const feedsTxt = await fetch("feeds.txt").then(res => res.text());
+    const feedsTxt = await fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
     const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line && !line.startsWith("#"));
 
     const feeds = lines.map(line => {
@@ -415,7 +415,7 @@ async function saveHistorial(useDescriptionForImage = false, maxConcurrent = 5) 
 
           (async () => {
             try {
-              const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(feed.url)}`);
+              const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(feed.url)}`, { cache: "no-store" });
               const xmlText = await response.text();
               const parser = new DOMParser();
               const xml = parser.parseFromString(xmlText, "application/xml");

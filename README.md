@@ -17,7 +17,8 @@ Desplegado en vivo: https://enterum.github.io/aggrhome/
 - Visualización del título, enlace e imagen de la primera noticia de cada feed.
 - Selección de intervalo de actualización automática desde la barra de navegación (Nunca, 1 minuto, 5 minutos, 10 minutos, 30 minutos).  
 - Imágenes por defecto para cada agregador si no hay imagen disponible en el feed.
-- Histórico de noticias por cada feed: Al ser un proyecto sin backend, el historial se guarda en el localStorage del navegador. Eso quiere decir que solo aparecerán en el historial las noticias que hayan ido apareciendo por cada feed mientras la aplicación se ha estado ejecutando en el navegador del usuario.
+- Histórico de noticias por cada feed.
+- Compartir noticias.
 
 ---
 
@@ -46,8 +47,9 @@ AGGRHOME/
 
 ## Registro de cambios importantes
 
-- 2025-04-12 - Se añade histórico de noticias por cada feed: Al ser un proyecto sin backend, el historial se guarda en el localStorage del navegador. Eso quiere decir que solo aparecerán en el historial las noticias que hayan ido apareciendo por cada feed mientras la aplicación se ha estado ejecutando en el navegador del usuario.
-- 2025-04-11 - Versión inicial
+- 2025-11-06 - Se añade la funcionalidad de compartir noticias mediante Web Share API.
+- 2025-11-05 - Se añade histórico de noticias por cada feed: Al ser un proyecto sin backend, el historial se guarda en el localStorage del navegador. Eso quiere decir que solo aparecerán en el historial las noticias que hayan ido apareciendo por cada feed mientras la aplicación se ha estado ejecutando en el navegador del usuario.
+- 2025-11-04 - Versión inicial.
 
 ---
 

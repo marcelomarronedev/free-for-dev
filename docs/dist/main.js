@@ -15,7 +15,7 @@ function getFirstItem(feedUrl_1) {
     return __awaiter(this, arguments, void 0, function* (feedUrl, useDescriptionForImage = false) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
         try {
-            const response = yield fetch(`https://corsproxy.io/?${encodeURIComponent(feedUrl)}`);
+            const response = yield fetch(`https://corsproxy.io/?${encodeURIComponent(feedUrl)}`, { cache: "no-store" });
             const xmlText = yield response.text();
             const parser = new DOMParser();
             const xml = parser.parseFromString(xmlText, "application/xml");
@@ -86,7 +86,7 @@ function getFirstItem(feedUrl_1) {
                     const exists = storedData.some(item => item.link === link);
                     if (!exists) {
                         if (!imageUrl) {
-                            const feedsTxt = yield fetch("feeds.txt").then(res => res.text());
+                            const feedsTxt = yield fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
                             const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
                             const feedDefault = lines.find(line => line.includes(feedUrl));
                             if (feedDefault) {
@@ -98,7 +98,7 @@ function getFirstItem(feedUrl_1) {
                         const esValida = yield validarImagen(imageUrl);
                         if (!esValida) {
                             // Si no es válida, usar imagen por defecto (si existe)
-                            const feedsTxt = yield fetch("feeds.txt").then(res => res.text());
+                            const feedsTxt = yield fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
                             const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
                             const feedDefault = lines.find(line => line.includes(feedUrl));
                             if (feedDefault) {
@@ -144,7 +144,7 @@ function loadFeeds() {
             if (loading)
                 loading.style.display = "block"; // mostrar spinner
             // Leer feeds.txt
-            const feedsTxt = yield fetch("feeds.txt").then(res => res.text());
+            const feedsTxt = yield fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
             const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
             // Mapear feeds a objetos { title, url, defaultImage }
             const feedsWithImages = lines.map(line => {
@@ -328,7 +328,7 @@ function loadFeeds() {
 function saveHistorial() {
     return __awaiter(this, arguments, void 0, function* (useDescriptionForImage = false, maxConcurrent = 5) {
         try {
-            const feedsTxt = yield fetch("feeds.txt").then(res => res.text());
+            const feedsTxt = yield fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
             const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line && !line.startsWith("#"));
             const feeds = lines.map(line => {
                 var _a, _b, _c;
@@ -355,7 +355,7 @@ function saveHistorial() {
                         (() => __awaiter(this, void 0, void 0, function* () {
                             var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
                             try {
-                                const response = yield fetch(`https://corsproxy.io/?${encodeURIComponent(feed.url)}`);
+                                const response = yield fetch(`https://corsproxy.io/?${encodeURIComponent(feed.url)}`, { cache: "no-store" });
                                 const xmlText = yield response.text();
                                 const parser = new DOMParser();
                                 const xml = parser.parseFromString(xmlText, "application/xml");

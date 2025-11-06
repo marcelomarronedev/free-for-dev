@@ -104,7 +104,7 @@
 <script>
   async function loadReadme() {
     try {
-      const response = await fetch('https://raw.githubusercontent.com/enterum/aggrhome/refs/heads/main/README.md');
+      const response = await fetch('https://raw.githubusercontent.com/enterum/aggrhome/refs/heads/main/README.md', { cache: "no-store" });
       if (!response.ok) throw new Error('No se pudo cargar el README');
       const markdown = await response.text();
       
@@ -139,7 +139,7 @@
     </div><!-- /.container -->
 
     <!-- JavaScript -->
-   <script type="module" src="dist/main.js"></script>
+   <script type="module" src="dist/main.js?v=101"></script>
   </body>
 
 </html>
