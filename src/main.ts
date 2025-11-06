@@ -14,6 +14,16 @@ function extractImageFromDescription(description: string): string {
 async function getFirstItem(feedUrl: string, useDescriptionForImage = false): Promise<FeedItem | null> {
   try {
     const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(feedUrl)}`, { cache: "no-store" });
+
+    // Si recibimos 429 u otro error HTTP, ignoramos este feed
+    if (!response.ok) {
+      if (response.status === 429) {
+        console.warn(`Feed ignorado por límite de peticiones: ${feedUrl}`);
+        return null; // retornamos null para que no se renderice
+      }
+      throw new Error(`Error HTTP ${response.status}`);
+    }
+
     const xmlText = await response.text();
     const parser = new DOMParser();
     const xml = parser.parseFromString(xmlText, "application/xml");

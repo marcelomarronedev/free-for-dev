@@ -16,6 +16,14 @@ function getFirstItem(feedUrl_1) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
         try {
             const response = yield fetch(`https://corsproxy.io/?${encodeURIComponent(feedUrl)}`, { cache: "no-store" });
+            // Si recibimos 429 u otro error HTTP, ignoramos este feed
+            if (!response.ok) {
+                if (response.status === 429) {
+                    console.warn(`Feed ignorado por límite de peticiones: ${feedUrl}`);
+                    return null; // retornamos null para que no se renderice
+                }
+                throw new Error(`Error HTTP ${response.status}`);
+            }
             const xmlText = yield response.text();
             const parser = new DOMParser();
             const xml = parser.parseFromString(xmlText, "application/xml");
