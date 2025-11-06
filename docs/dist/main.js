@@ -16,8 +16,8 @@ function getFirstItem(feedUrl_1) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
         try {
             const response = yield fetch(`https://corsproxy.io/?${encodeURIComponent(feedUrl)}`, { cache: "no-store" });
-            console.log("feedUrl.=" + feedUrl);
-            console.log("response.ok=" + response.ok + " - response.status=" + response.status);
+            //console.log("feedUrl.=" + feedUrl);
+            //console.log("response.ok=" + response.ok + " - response.status=" + response.status);
             // Si recibimos 429 u otro error HTTP, ignoramos este feed
             if (!response.ok) {
                 if (response.status === 429) {
@@ -189,12 +189,14 @@ function loadFeeds() {
             // Actualizar contenido de cada feed
             items.forEach((feedItem, index) => {
                 var _a;
-                if (!feedItem)
-                    return;
-                const feed = feedsWithImages[index];
                 const container = document.querySelector(`.portfolio-item[data-feed="${index}"]`);
                 if (!container)
                     return;
+                if (!feedItem) {
+                    container.style.display = 'none';
+                    return;
+                }
+                const feed = feedsWithImages[index];
                 const linkEl = container.querySelector("a");
                 const imgEl = container.querySelector("img");
                 const titleEl = container.querySelector("p a");
