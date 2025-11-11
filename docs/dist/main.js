@@ -156,11 +156,35 @@ function loadFeeds() {
             // Leer feeds.txt
             const feedsTxt = yield fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
             const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
-            // Mapear feeds a objetos { title, url, defaultImage }
-            const feedsWithImages = lines.map(line => {
+            // 🔹 Obtener los votos desde el backend
+            let votesData = [];
+            try {
+                const votesResponse = yield fetch("https://enterum.alwaysdata.net/getvotes.php?nocache=" + Date.now(), {
+                    cache: "no-store"
+                });
+                if (votesResponse.ok) {
+                    votesData = yield votesResponse.json();
+                }
+                else {
+                    console.warn("No se pudo obtener la lista de votos. Status:", votesResponse.status);
+                }
+            }
+            catch (err) {
+                console.error("Error al obtener los votos:", err);
+            }
+            // 🔹 Mapear feeds con votos
+            let feedsWithImages = lines.map(line => {
                 const [title, url, defaultImage] = line.split(",");
-                return { title, url, defaultImage };
+                const feedVotes = votesData.find(v => v.feed.trim().toLowerCase() === title.trim().toLowerCase());
+                return {
+                    title,
+                    url,
+                    defaultImage,
+                    votes: feedVotes ? feedVotes.votes : 0
+                };
             });
+            // 🔹 Ordenar de mayor a menor número de votos
+            feedsWithImages.sort((a, b) => b.votes - a.votes);
             // Limpiar solo este contenedor
             container.innerHTML = "";
             const itemsPerRow = 3;
@@ -173,11 +197,11 @@ function loadFeeds() {
                     colDiv.className = "col-md-4 portfolio-item";
                     colDiv.setAttribute("data-feed", String(j));
                     colDiv.innerHTML = `
-          <a target="_blank" href="#"><img class="img-responsive" src="#"></a>
-          <h3>${feed.title}</h3>
-          <p><a target="_blank" href="##">...</a></p>
-          <p class="pubdate"></p>
-        `;
+        <a target="_blank" href="#"><img class="img-responsive" src="#"></a>
+        <h3>${feed.title} <span class="votes-count" style="font-size:14px; color:gray;">(${feed.votes} votos)</span></h3>
+        <p><a target="_blank" href="##">...</a></p>
+        <p class="pubdate"></p>
+      `;
                     rowDiv.appendChild(colDiv);
                 }
                 container.appendChild(rowDiv);
@@ -188,7 +212,7 @@ function loadFeeds() {
             const items = yield Promise.all(feedsWithImages.map((feed, idx) => getFirstItem(feed.url, descriptionImageFlags[idx])));
             // Actualizar contenido de cada feed
             items.forEach((feedItem, index) => {
-                var _a;
+                var _a, _b;
                 const container = document.querySelector(`.portfolio-item[data-feed="${index}"]`);
                 if (!container)
                     return;
@@ -220,7 +244,7 @@ function loadFeeds() {
                 // Dentro del forEach donde ya tienes container definido
                 const commentsToggle = document.createElement("a");
                 commentsToggle.href = "#";
-                commentsToggle.textContent = "Comentarios sobre este agregador";
+                commentsToggle.textContent = "🗨️ Comentarios sobre este agregador";
                 commentsToggle.style.display = "inline-block";
                 commentsToggle.style.marginTop = "10px";
                 commentsToggle.style.cursor = "pointer";
@@ -257,10 +281,56 @@ function loadFeeds() {
                 // Añadir al feed
                 container.appendChild(commentsToggle);
                 container.appendChild(commentsDiv);
+                //Nueva funcionalidad 11/11/2025: // Botón de voto 👍
+                const h3El0 = container.querySelector("h3");
+                // Dentro del forEach donde ya tienes h3El
+                if (h3El0) {
+                    // Crear botón 👍
+                    const voteBtn = document.createElement("span");
+                    voteBtn.style.cursor = "pointer";
+                    voteBtn.style.marginLeft = "10px";
+                    voteBtn.title = "Votar este feed";
+                    voteBtn.textContent = '👍';
+                    h3El0.appendChild(voteBtn);
+                    // Encontrar (o crear) el span de votos
+                    let votesSpan = h3El0.querySelector(".votes-count");
+                    if (!votesSpan) {
+                        votesSpan = document.createElement("span");
+                        votesSpan.className = "votes-count";
+                        votesSpan.style.fontSize = "14px";
+                        votesSpan.style.color = "gray";
+                        votesSpan.style.marginLeft = "5px";
+                        votesSpan.textContent = `(${(_a = feed.votes) !== null && _a !== void 0 ? _a : 0} votos)`;
+                        h3El0.appendChild(votesSpan);
+                    }
+                    // Evento click
+                    voteBtn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
+                        try {
+                            const response = yield fetch(`https://enterum.alwaysdata.net/vote.php?feed=${encodeURIComponent(feed.title)}`);
+                            if (response.ok) {
+                                const data = yield response.json();
+                                if (data.success) {
+                                    // Actualizar votos con el valor que devuelve el backend
+                                    feed.votes = data.votes;
+                                    votesSpan.textContent = `(${feed.votes} votos)`;
+                                }
+                                else {
+                                    console.error("Error al registrar el voto:", data);
+                                }
+                            }
+                            else {
+                                console.error("Error al registrar el voto:", response.statusText);
+                            }
+                        }
+                        catch (err) {
+                            console.error("Error de red al votar:", err);
+                        }
+                    }));
+                }
                 // Nueva funcionalidad 05/11/2025: Mostrar histórico:
                 const h3El = container.querySelector("h3");
                 if (h3El) {
-                    const emoji = ((_a = h3El.textContent) === null || _a === void 0 ? void 0 : _a.includes("🕒")) ? h3El.querySelector("span") : null;
+                    const emoji = ((_b = h3El.textContent) === null || _b === void 0 ? void 0 : _b.includes("🕒")) ? h3El.querySelector("span") : null;
                     let emojiEl;
                     if (!emoji) {
                         emojiEl = document.createElement("span");

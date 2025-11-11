@@ -3,6 +3,7 @@ interface FeedItem {
   link: string;
   imageUrl: string;
   pubDate: string; 
+  votes?: number;
 }
 
 function extractImageFromDescription(description: string): string {
@@ -175,11 +176,35 @@ async function loadFeeds() {
     const feedsTxt = await fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
     const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
 
-    // Mapear feeds a objetos { title, url, defaultImage }
-    const feedsWithImages = lines.map(line => {
+    // 🔹 Obtener los votos desde el backend
+    let votesData: Array<{ feed: string; votes: number }> = [];
+    try {
+      const votesResponse = await fetch("https://enterum.alwaysdata.net/getvotes.php?nocache=" + Date.now(), {
+        cache: "no-store"
+      });
+      if (votesResponse.ok) {
+        votesData = await votesResponse.json();
+      } else {
+        console.warn("No se pudo obtener la lista de votos. Status:", votesResponse.status);
+      }
+    } catch (err) {
+      console.error("Error al obtener los votos:", err);
+    }
+
+    // 🔹 Mapear feeds con votos
+    let feedsWithImages = lines.map(line => {
       const [title, url, defaultImage] = line.split(",");
-      return { title, url, defaultImage };
+      const feedVotes = votesData.find(v => v.feed.trim().toLowerCase() === title.trim().toLowerCase());
+      return {
+        title,
+        url,
+        defaultImage,
+        votes: feedVotes ? feedVotes.votes : 0
+      };
     });
+
+    // 🔹 Ordenar de mayor a menor número de votos
+    feedsWithImages.sort((a, b) => b.votes - a.votes);
 
 
     // Limpiar solo este contenedor
@@ -198,11 +223,12 @@ async function loadFeeds() {
         colDiv.setAttribute("data-feed", String(j));
 
         colDiv.innerHTML = `
-          <a target="_blank" href="#"><img class="img-responsive" src="#"></a>
-          <h3>${feed.title}</h3>
-          <p><a target="_blank" href="##">...</a></p>
-          <p class="pubdate"></p>
-        `;
+        <a target="_blank" href="#"><img class="img-responsive" src="#"></a>
+        <h3>${feed.title} <span class="votes-count" style="font-size:14px; color:gray;">(${feed.votes} votos)</span></h3>
+        <p><a target="_blank" href="##">...</a></p>
+        <p class="pubdate"></p>
+      `;
+      
 
         rowDiv.appendChild(colDiv);
       }
@@ -259,7 +285,7 @@ async function loadFeeds() {
 // Dentro del forEach donde ya tienes container definido
 const commentsToggle = document.createElement("a");
 commentsToggle.href = "#";
-commentsToggle.textContent = "Comentarios sobre este agregador";
+commentsToggle.textContent = "🗨️ Comentarios sobre este agregador";
 commentsToggle.style.display = "inline-block";
 commentsToggle.style.marginTop = "10px";
 commentsToggle.style.cursor = "pointer";
@@ -300,6 +326,51 @@ commentsToggle.addEventListener("click", (e) => {
 container.appendChild(commentsToggle);
 container.appendChild(commentsDiv);
 
+ //Nueva funcionalidad 11/11/2025: // Botón de voto 👍
+const h3El0 = container.querySelector("h3");
+// Dentro del forEach donde ya tienes h3El
+if (h3El0) {
+  // Crear botón 👍
+  const voteBtn = document.createElement("span");
+  voteBtn.style.cursor = "pointer";
+  voteBtn.style.marginLeft = "10px";
+  voteBtn.title = "Votar este feed";
+  voteBtn.textContent = '👍';
+  h3El0.appendChild(voteBtn);
+
+  // Encontrar (o crear) el span de votos
+  let votesSpan = h3El0.querySelector(".votes-count") as HTMLSpanElement | null;
+  if (!votesSpan) {
+    votesSpan = document.createElement("span");
+    votesSpan.className = "votes-count";
+    votesSpan.style.fontSize = "14px";
+    votesSpan.style.color = "gray";
+    votesSpan.style.marginLeft = "5px";
+    votesSpan.textContent = `(${feed.votes ?? 0} votos)`;
+    h3El0.appendChild(votesSpan);
+  }
+
+  // Evento click
+  voteBtn.addEventListener("click", async () => {
+    try {
+      const response = await fetch(`https://enterum.alwaysdata.net/vote.php?feed=${encodeURIComponent(feed.title)}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          // Actualizar votos con el valor que devuelve el backend
+          feed.votes = data.votes;
+          votesSpan!.textContent = `(${feed.votes} votos)`;
+        } else {
+          console.error("Error al registrar el voto:", data);
+        }
+      } else {
+        console.error("Error al registrar el voto:", response.statusText);
+      }
+    } catch (err) {
+      console.error("Error de red al votar:", err);
+    }
+  });
+}
 
 
  // Nueva funcionalidad 05/11/2025: Mostrar histórico:
