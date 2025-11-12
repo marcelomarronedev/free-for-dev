@@ -7,15 +7,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-function extractImageFromDescription(description) {
-    const imgMatch = description.match(/<img\s+src=['"]([^'"]+)['"]/);
-    return imgMatch ? imgMatch[1] : "";
-}
-function getFirstItem(feedUrl_1) {
-    return __awaiter(this, arguments, void 0, function* (feedUrl, useDescriptionForImage = false) {
+function getFirstItem(feedUrl_1, type_1) {
+    return __awaiter(this, arguments, void 0, function* (feedUrl, type, useDescriptionForImage = false) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
         try {
             const response = yield fetchWithTimeout(`https://corsproxy.io/?${encodeURIComponent(feedUrl)}`, { cache: "no-store" });
+            const isAtom = type === "atom";
             //console.log("feedUrl.=" + feedUrl);
             //console.log("response.ok=" + response.ok + " - response.status=" + response.status);
             // Si recibimos 429 u otro error HTTP, ignoramos este feed
@@ -29,8 +26,6 @@ function getFirstItem(feedUrl_1) {
             const xmlText = yield response.text();
             const parser = new DOMParser();
             const xml = parser.parseFromString(xmlText, "application/xml");
-            // Los de Reddit son Atom, por lo que lo tratamos así por el momento (TODO:meter campo en feeds.txt para indicar tipo)
-            const isAtom = feedUrl.includes("reddit.com");
             let item = null;
             if (isAtom) {
                 // Para Atom, buscamos el primer <entry>
@@ -116,7 +111,8 @@ function getFirstItem(feedUrl_1) {
                                 imageUrl = parts[2] || "";
                             }
                         }
-                        storedData.push({ host, title, link, imageUrl, pubDate });
+                        let storedData = storedDataJson ? JSON.parse(storedDataJson) : [];
+                        storedData.push({ host, title, link, imageUrl, pubDate, type: type });
                         localStorage.setItem("feedsHistory", JSON.stringify(storedData));
                     }
                 }
@@ -172,18 +168,18 @@ function loadFeeds() {
             catch (err) {
                 console.error("Error al obtener los votos:", err);
             }
-            // 🔹 Mapear feeds con votos
             let feedsWithImages = lines.map(line => {
-                const [title, url, defaultImage] = line.split(",");
+                const [title, url, defaultImage, type, useDescription] = line.split(",");
                 const feedVotes = votesData.find(v => v.feed.trim().toLowerCase() === title.trim().toLowerCase());
                 return {
                     title,
                     url,
                     defaultImage,
+                    type: (type || "rss").trim().toLowerCase(),
+                    useDescriptionForImage: (useDescription === null || useDescription === void 0 ? void 0 : useDescription.trim().toLowerCase()) === "true",
                     votes: feedVotes ? feedVotes.votes : 0
                 };
             });
-            // 🔹 Ordenar de mayor a menor número de votos
             feedsWithImages.sort((a, b) => b.votes - a.votes);
             // Limpiar solo este contenedor
             container.innerHTML = "";
@@ -206,10 +202,8 @@ function loadFeeds() {
                 }
                 container.appendChild(rowDiv);
             }
-            // Array para indicar si usar <description> para la imagen
-            const descriptionImageFlags = feedsWithImages.map(feed => feed.url.includes("meneame") || feed.url.includes("mediatize"));
             // Obtener items
-            const items = yield Promise.all(feedsWithImages.map((feed, idx) => getFirstItem(feed.url, descriptionImageFlags[idx])));
+            const items = yield Promise.all(feedsWithImages.map(feed => getFirstItem(feed.url, feed.type, feed.useDescriptionForImage)));
             // Actualizar contenido de cada feed
             items.forEach((feedItem, index) => {
                 var _a, _b;
@@ -307,23 +301,64 @@ function loadFeeds() {
                     voteBtn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
                         try {
                             const response = yield fetch(`https://enterum.alwaysdata.net/vote.php?feed=${encodeURIComponent(feed.title)}`);
+                            // 429 → demasiadas peticiones desde esta red
+                            if (response.status === 429) {
+                                Swal.fire({
+                                    icon: "warning",
+                                    title: "Demasiadas peticiones",
+                                    text: "Demasiadas peticiones desde esta red. Inténtelo más tarde.",
+                                });
+                                return;
+                            }
+                            // 409 → ya se votó desde esta IP
+                            if (response.status === 409) {
+                                Swal.fire({
+                                    icon: "info",
+                                    title: "Voto duplicado",
+                                    text: "Ya se votó desde esta misma IP.",
+                                });
+                                return;
+                            }
                             if (response.ok) {
                                 const data = yield response.json();
                                 if (data.success) {
                                     // Actualizar votos con el valor que devuelve el backend
                                     feed.votes = data.votes;
                                     votesSpan.textContent = `(${feed.votes} votos)`;
+                                    // ✅ Mostrar mensaje de éxito
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "¡Gracias!",
+                                        text: "Su voto ha sido contabilizado.",
+                                        timer: 2000,
+                                        showConfirmButton: false,
+                                    });
                                 }
                                 else {
                                     console.error("Error al registrar el voto:", data);
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Error",
+                                        text: "No se pudo registrar su voto.",
+                                    });
                                 }
                             }
                             else {
                                 console.error("Error al registrar el voto:", response.statusText);
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: `No se pudo registrar el voto. (${response.status})`,
+                                });
                             }
                         }
                         catch (err) {
                             console.error("Error de red al votar:", err);
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error de conexión",
+                                text: "No se pudo conectar con el servidor.",
+                            });
                         }
                     }));
                 }
@@ -453,9 +488,15 @@ function saveHistorial() {
             const feedsTxt = yield fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
             const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line && !line.startsWith("#"));
             const feeds = lines.map(line => {
-                var _a, _b, _c;
+                var _a, _b, _c, _d, _e;
                 const parts = line.split(",");
-                return { title: (_a = parts[0]) === null || _a === void 0 ? void 0 : _a.trim(), url: (_b = parts[1]) === null || _b === void 0 ? void 0 : _b.trim(), defaultImage: ((_c = parts[2]) === null || _c === void 0 ? void 0 : _c.trim()) || "" };
+                return {
+                    title: (_a = parts[0]) === null || _a === void 0 ? void 0 : _a.trim(),
+                    url: (_b = parts[1]) === null || _b === void 0 ? void 0 : _b.trim(),
+                    defaultImage: ((_c = parts[2]) === null || _c === void 0 ? void 0 : _c.trim()) || "",
+                    type: (((_d = parts[3]) === null || _d === void 0 ? void 0 : _d.trim()) || "rss").toLowerCase(),
+                    useDescriptionForImage: (((_e = parts[4]) === null || _e === void 0 ? void 0 : _e.trim().toLowerCase()) === "true") // <-- nueva propiedad
+                };
             });
             const storedDataJson = localStorage.getItem("feedsHistory");
             let storedData = storedDataJson ? JSON.parse(storedDataJson) : [];
@@ -533,7 +574,7 @@ function saveHistorial() {
                                         const esValida = yield validarImagen(imageUrl);
                                         if (!esValida)
                                             imageUrl = feed.defaultImage || "";
-                                        storedData.push({ host, title, link, imageUrl, pubDate });
+                                        storedData.push({ host, title, link, imageUrl, pubDate, type: feed.type, fromDescription: feed.useDescriptionForImage });
                                     }
                                     catch (err) {
                                         console.error("Error guardando item en localStorage:", err);

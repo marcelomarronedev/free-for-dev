@@ -91,13 +91,19 @@ npm run start
 
 ## Añadir nuevos feeds
 
-Los feeds RSS se gestionan mediante el archivo `feeds.txt` en la raíz del proyecto. Cada línea del archivo contiene el nombre del sitio, url del feed y url de la imagen por defecto separados por comas:
+Los feeds RSS se gestionan mediante el archivo `feeds.txt` en la raíz del proyecto. Cada línea del archivo contiene, separados por comas, los siguientes datos:
+
+- nombre del feed
+- url del feed
+- url de la imagen por defecto
+- tipo de feed: "rss" o "atom"
+- si la imagen está incluída en el tag de descripción (true) o no (false)
 
 ```
-Menéame,https://www.meneame.net/rss,https://www.meneame.net/img/mnm/logo.svg
-KillBait,https://killbait.com/feed-es.php,https://killbait.com/assets/images/logo/5.png
-Tardigram,https://tardigram.com/rss,https://tardigram.com/media/cache/resolve/post_thumb/2d/07/2d07bae7d94ca622e9ec3584a8dd3b10ba33677a2338ddd2bc7db6907860ff0e.jpg
-Mediatize,https://www.mediatize.info/rss,https://www.mediatize.info/v_78/img/mdtz/logo.svg
+Menéame,https://www.meneame.net/rss,https://www.meneame.net/img/mnm/logo.svg,rss,true
+KillBait,https://killbait.com/feed-es.php,https://killbait.com/assets/images/logo/5.png,rss,false
+Tardigram,https://tardigram.com/rss,https://tardigram.com/media/cache/resolve/post_thumb/2d/07/2d07bae7d94ca622e9ec3584a8dd3b10ba33677a2338ddd2bc7db6907860ff0e.jpg,rss,true
+Mediatize,https://www.mediatize.info/rss,https://www.mediatize.info/v_78/img/mdtz/logo.svg,rss,false
 ```
 
 Si quieres añadir un nuevo feed al proyecto:
