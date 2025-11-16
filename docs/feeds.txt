@@ -4,3 +4,4 @@ Tardigram,https://tardigram.com/rss,https://tardigram.com/media/cache/resolve/po
 Mediatize,https://www.mediatize.info/rss,https://www.mediatize.info/v_78/img/mdtz/logo.svg,rss,true
 r/noticias_en_espanol,https://www.reddit.com/r/noticias_en_espanol/new.rss,https://www.divxland.org/wp-content/uploads/2025/04/reddit-thumbnail.png,atom,false
 Renegados,https://repostea.renegados.es/rss/published,https://www.renegados.es/renegados1.jpg,rss,false
+Limonatic,https://limonatic.com/rss/portada.xml,https://limonatic.com/storage/branding/Ah5JlxuWLcLPSz7wG61Wp7KVXjW4eGi3GNOUeb6I.png,rss,false
