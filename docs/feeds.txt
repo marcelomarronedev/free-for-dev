@@ -16,3 +16,5 @@ El Confidencial,https://rss.elconfidencial.com/espana,https://www.ecestaticos.
 The New York Times,https://rss.nytimes.com/services/xml/rss/nyt/World.xml,https://ropercenter.cornell.edu/sites/default/files/styles/600x/public/Images/New-York-Times-Logo8x6_0.png?itok=6IaMjMpQ,rss,false,PON,US,en  
 The Washington Post,https://feeds.washingtonpost.com/rss/world,https://www.akamai.com/site/es/images/logo/2019/washington-post-logo.svg,rss,false,PON,US,en  
 Los Angeles Times,https://www.latimes.com/world-nation/rss2.0.xml,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI0qzS2LtKHYXpwh_4cPyHIKUnwbXpNVd54Q&s,rss,false,PON,US,en  
+
+Jot Down,https://www.jotdown.es/feed/,https://www.jotdown.es/wp-content/uploads/2022/07/cropped-logoJD-e1658471614636.png,rss,false,REV,ES,es
