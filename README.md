@@ -1,128 +1,129 @@
-# AGGRHOME
+# FEEDSHOME
 
-AGGRHOME es un lector de feeds RSS que muestra las portadas de los principales agregadores de noticias en español. La página carga automáticamente los feeds RSS de varios sitios, muestra el primer artículo de cada feed y permite actualizar la información de manera periódica según un intervalo configurable.
+Discover, organize, and follow your favorite feeds in one place. FEEDSHOME offers a complete directory of feeds grouped by language, country, and category so you can stay up to date with the news, blogs, and content that interest you most---without wasting time searching.
 
-Desplegado en vivo: https://enterum.github.io/aggrhome/
+Live demo: https://enterum.github.io/aggrhome/
 
----
+------------------------------------------------------------------------
 
-## Funcionalidades
+## Features
 
-- Lectura de feeds RSS de distintos agregadores de noticias como:
-  - <a href="https://www.meneame.net" target="_blank">Menéame</a>
-  - <a href="https://killbait.com" target="_blank">KillBait</a>
-  - <a href="https://tardigram.com" target="_blank">Tardigram</a>
-  - <a href="https://www.mediatize.info" target="_blank">Mediatize</a>
-  - ...
-- Visualización del título, enlace e imagen de la primera noticia de cada feed.
-- Selección de intervalo de actualización automática desde la barra de navegación (Nunca, 1 minuto, 5 minutos, 10 minutos, 30 minutos).  
-- Imágenes por defecto para cada agregador si no hay imagen disponible en el feed.
-- Histórico de noticias por cada feed.
-- Compartir noticias.
-- Se pueden realizar comentarios sobre cada agregador de noticias.
-- Se puede votar cada agregador: El número de votos determinará el orden en el listado.
+-   Reading RSS feeds from various news aggregators, online newspapers, blogs, magazines, etc.
+-   Categorization by language, topic, and country.
+-   Display of the title, link, and image of the first news item from each feed.
+-   Automatic refresh interval selection from the navigation bar (Never, 1 minute, 5 minutes, 10 minutes, 30 minutes).
+-   Default images for feeds when no image is available.
+-   News history for each feed.
+-   Share feed items.
+-   Users can comment on each feed.
+-   Voting system for feeds: the number of votes determines their order in the list.
+-   Users can submit new feeds to the directory (they will be reviewed before being accepted).
 
----
+------------------------------------------------------------------------
 
-## Estructura del proyecto
+## Project Structure
 
 ```
-AGGRHOME/
-├── docs/                  # Archivos estáticos: HTML, CSS, etc.
-├──── css/                 # Hojas de estilo
-├──── fonts/               # Ficheros de fuentes
-├──── dist/                
-├────── main.ts            # Código TypeScript compilado
-├──── index.html           # Archivo index HTML
-├──── feeds.txt            # Lista de feeds RSS e imágenes por defecto
-├── src/                   
-├──── main.ts              # Código TypeScript
-├── package.json           # Dependencias y scripts
-├── package-lock.json      # Dependencias y scripts
-├── tsconfig.json          # Configuración TypeScript
-├── README.md              # README proyecto
-├── LICENSE                # LICENCIA del proyecto
-└── .gitignore
-```
+    AGGRHOME/
+    ├── docs/                  # Static files: HTML, CSS, etc.
+    ├──── css/                 # Stylesheets
+    ├──── fonts/               # Font files
+    ├──── img/                 # Images
+    ├──── dist/
+    ├────── main.ts            # Compiled TypeScript code
+    ├──── index.html           # Main HTML file
+    ├──── index-xx.html        # HTML file for each language
+    ├──── feeds.txt            # List of RSS/Atom feeds
+    ├──── categoris.txt        # List of categories
+    ├── src/
+    ├──── main.ts              # Source TypeScript code
+    ├── package.json           # Dependencies and scripts
+    ├── package-lock.json      # Dependency lock file
+    ├── tsconfig.json          # TypeScript configuration
+    ├── README.md              # Main project README (English)
+    ├── README-xx.md           # Translated READMEs
+    ├── LICENSE                # Project license
+    └── .gitignore
+```    
 
----
+------------------------------------------------------------------------
 
-## Registro de cambios importantes
+## Changelog
 
-- 2025-11-11 - Se añade la funcionalidad de votar agregadores (requiere backend). Un voto por IP.
-- 2025-11-06 - Se añade la funcionalidad de comentar cada agregador con [utteranc.es](https://utteranc.es).
-- 2025-11-06 - Se añade la funcionalidad de compartir noticias mediante Web Share API.
-- 2025-11-05 - Se añade histórico de noticias por cada feed: Al ser un proyecto sin backend, el historial se guarda en el localStorage del navegador. Eso quiere decir que solo aparecerán en el historial las noticias que hayan ido apareciendo por cada feed mientras la aplicación se ha estado ejecutando en el navegador del usuario.
-- 2025-11-04 - Versión inicial.
+-   **2025-11-20** -- Project renamed from AGGHOME to FEEDSHOME, generalizing its purpose and adding new functionalities
+    (language--topic--country categorization, feed submissions).
+-   **2025-11-11** -- Added voting functionality for aggregators (requires backend). One vote per IP.
+-   **2025-11-06** -- Added commenting for each aggregator using [utteranc.es](https://utteranc.es).
+-   **2025-11-06** -- Added news sharing via the Web Share API.
+-   **2025-11-05** -- Added news history for each feed. Since there is no backend, the history is stored in the browser's localStorage:
+    only news that appeared while the application was open will be     shown.
+-   **2025-11-04** -- Initial version.
 
----
+------------------------------------------------------------------------
 
-## Uso
+## Usage
 
-1. Clonar el repositorio:
+1.  Clone the repository:
 
-```bash
+``` bash
 git clone https://github.com/enterum/aggrhome.git
 cd aggrhome
 ```
 
-2. Instalar dependencias:
+2.  Install dependencies:
 
-```bash
+``` bash
 npm install
 ```
 
-3. Compilar TypeScript:
+3.  Compile TypeScript:
 
-```bash
+``` bash
 npm run build
 ```
 
-4. Iniciar el servidor local:
+4.  Start the local server:
 
-```bash
+``` bash
 npm run start
 ```
 
-- Esto abrirá `docs/index.html` en tu navegador y cargará los feeds.
-- Puedes cambiar el intervalo de refresco desde la barra de navegación.
+-   This will open `docs/index.html` in your browser and load the feeds.
+-   You can change the refresh interval from the navigation bar.
 
----
+------------------------------------------------------------------------
 
-## Añadir nuevos feeds
+## Adding New Feeds Manually (in your own fork)
 
-Los feeds RSS se gestionan mediante el archivo `feeds.txt` en la raíz del proyecto. Cada línea del archivo contiene, separados por comas, los siguientes datos:
+RSS feeds are managed through the `feeds.txt` file located at the root of the project.
+Each line contains, separated by commas:
 
-- nombre del feed
-- url del feed
-- url de la imagen por defecto
-- tipo de feed: "rss" o "atom"
-- si la imagen está incluída en el tag de descripción (true) o no (false)
+-   feed name
+-   feed URL
+-   default image URL
+-   feed type: `rss` or `atom`
+-   whether the image is included in the description tag (`true`/`false`)
+-   category code
+-   country code
+-   language code
+
+Example:
 
 ```
-Menéame,https://www.meneame.net/rss,https://www.meneame.net/img/mnm/logo.svg,rss,true
-KillBait,https://killbait.com/feed-es.php,https://killbait.com/assets/images/logo/5.png,rss,false
-Tardigram,https://tardigram.com/rss,https://tardigram.com/media/cache/resolve/post_thumb/2d/07/2d07bae7d94ca622e9ec3584a8dd3b10ba33677a2338ddd2bc7db6907860ff0e.jpg,rss,true
-Mediatize,https://www.mediatize.info/rss,https://www.mediatize.info/v_78/img/mdtz/logo.svg,rss,false
-```
+    Menéame,https://www.meneame.net/rss,https://enterum.github.io/aggrhome/img/meneame.png,rss,true,AGR,ES,es
+    KillBait,https://killbaitnews.github.io/rssfeeds/en.rss,https://enterum.github.io/aggrhome/img/killbait.png,rss,false,AGR,ES,en
+    El País,https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/ultimas-noticias/portada,https://static.elpais.com/dist/resources/images/logos/primary/el-pais.svg,rss,false,PON,ES,es
+```    
 
-Si quieres añadir un nuevo feed al proyecto:
+------------------------------------------------------------------------
 
-1. Haz una pull request.  
-2. Añade una nueva línea en `feeds.txt` que contenga el nombre del sitio, url del feed y url de la imagen por defecto separados por comas.
-3. Asegúrate de que el feed siga el formato RSS estándar.
+## Adding New Feeds via the Form
 
-> Nota: Una vez aprobada la pull request el proyecto leerá automáticamente los feeds de `feeds.txt` al cargarse, sin necesidad de modificar el código.
+Just enter the feed URL, complete the captcha, and click **"Add feed"**. The selected language, category, and country at the moment of submission will be used.
 
----
+------------------------------------------------------------------------
 
-## Contribución
+## License
 
-- Pull requests son bienvenidas para añadir nuevos feeds, mejorar el diseño o corregir errores.  
-- Por favor, sigue la estructura y buenas prácticas existentes.  
-
----
-
-## Licencia
-
-Este proyecto está bajo la licencia MIT. Puedes usarlo y modificarlo libremente.
+This project is released under the **MIT License**. You are free to use
+and modify it.

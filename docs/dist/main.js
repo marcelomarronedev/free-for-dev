@@ -7,123 +7,63 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+let allCategories = [];
+let firstLoad = true;
 function getFirstItem(feedUrl_1, type_1) {
     return __awaiter(this, arguments, void 0, function* (feedUrl, type, useDescriptionForImage = false) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
         try {
             const response = yield fetchWithTimeout(`https://corsproxy.io/?${encodeURIComponent(feedUrl)}`, { cache: "no-store" });
             const isAtom = type === "atom";
-            //console.log("feedUrl.=" + feedUrl);
-            //console.log("response.ok=" + response.ok + " - response.status=" + response.status);
-            // Si recibimos 429 u otro error HTTP, ignoramos este feed
             if (!response.ok) {
                 if (response.status != 200) {
                     console.warn(`Feed ignorado por error ${response.status}: ${feedUrl}`);
-                    return null; // retornamos null para que no se renderice
+                    return null;
                 }
                 throw new Error(`Error HTTP ${response.status}`);
             }
             const xmlText = yield response.text();
             const parser = new DOMParser();
             const xml = parser.parseFromString(xmlText, "application/xml");
-            let item = null;
-            if (isAtom) {
-                // Para Atom, buscamos el primer <entry>
-                item = xml.querySelector("entry");
-            }
-            else {
-                // Si es RSS, buscamos el primer <item>
-                item = xml.querySelector("item");
-            }
-            if (!item) {
-                console.error("No se encontró el elemento <entry> o <item> en el feed.");
+            let item = isAtom ? xml.querySelector("entry") : xml.querySelector("item");
+            if (!item)
                 return null;
-            }
             const title = (_b = (_a = item.querySelector("title")) === null || _a === void 0 ? void 0 : _a.textContent) !== null && _b !== void 0 ? _b : "";
-            let link = "";
-            if (isAtom) // Para Atom (Reddit), revisamos todos los enlaces posibles
-                link = (_d = (_c = item.querySelector("link")) === null || _c === void 0 ? void 0 : _c.getAttribute("href")) !== null && _d !== void 0 ? _d : "";
-            else // En RSS normal, buscamos el primer <link>
-                link = (_f = (_e = item.querySelector("link")) === null || _e === void 0 ? void 0 : _e.textContent) !== null && _f !== void 0 ? _f : "";
-            // Imagen
+            let link = isAtom ? (_d = (_c = item.querySelector("link")) === null || _c === void 0 ? void 0 : _c.getAttribute("href")) !== null && _d !== void 0 ? _d : "" : (_f = (_e = item.querySelector("link")) === null || _e === void 0 ? void 0 : _e.textContent) !== null && _f !== void 0 ? _f : "";
             let imageUrl = "";
             if (isAtom) {
-                // En Atom, la imagen puede estar en el contenido de la entrada (<content>)
                 const content = (_h = (_g = item.querySelector("content")) === null || _g === void 0 ? void 0 : _g.textContent) !== null && _h !== void 0 ? _h : "";
                 const imgMatch = content.match(/<img[^>]+src=['"]([^'"]+)['"]/);
                 if (imgMatch)
                     imageUrl = imgMatch[1];
             }
             else {
-                // En RSS, buscamos la imagen en <media:content> o <enclosure>
                 const media = item.querySelector("media\\:content, enclosure");
                 if (media)
                     imageUrl = (_j = media.getAttribute("url")) !== null && _j !== void 0 ? _j : "";
             }
-            // Si no encontramos una imagen, tratamos de obtenerla desde la descripción (si está habilitado)
             if (!imageUrl && useDescriptionForImage) {
                 const description = (_l = (_k = item.querySelector("description")) === null || _k === void 0 ? void 0 : _k.textContent) !== null && _l !== void 0 ? _l : "";
                 const match = description.match(/<img[^>]+src=['"]([^'"]+)['"]/);
                 if (match)
                     imageUrl = match[1];
             }
-            // Fecha de publicación
             let pubDate = "";
             if (isAtom) {
                 const updatedRaw = (_o = (_m = item.querySelector("updated")) === null || _m === void 0 ? void 0 : _m.textContent) !== null && _o !== void 0 ? _o : "";
-                if (updatedRaw) {
-                    const updatedDate = new Date(updatedRaw);
-                    pubDate = formatDate(updatedDate); // Asumiendo que formatDate es una función que convierte la fecha
-                }
+                if (updatedRaw)
+                    pubDate = formatDate(new Date(updatedRaw));
             }
             else {
-                // En RSS, usamos <pubDate> si está disponible
                 const pubDateRaw = (_q = (_p = item.querySelector("pubDate")) === null || _p === void 0 ? void 0 : _p.textContent) !== null && _q !== void 0 ? _q : "";
                 const pubDateObj = pubDateRaw ? new Date(pubDateRaw) : null;
                 pubDate = pubDateObj ? formatDate(pubDateObj) : "";
             }
-            if (link) {
-                try {
-                    const urlObj = new URL(link);
-                    const host = urlObj.host;
-                    const storedDataJson = localStorage.getItem("feedsHistory");
-                    let storedData = storedDataJson ? JSON.parse(storedDataJson) : [];
-                    const exists = storedData.some(item => item.link === link);
-                    if (!exists) {
-                        if (!imageUrl) {
-                            const feedsTxt = yield fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
-                            const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
-                            const feedDefault = lines.find(line => line.includes(feedUrl));
-                            if (feedDefault) {
-                                const parts = feedDefault.split(",");
-                                imageUrl = parts[2] || ""; // la tercera columna es la imagen por defecto
-                            }
-                        }
-                        //Validar imagen antes de guardar:
-                        const esValida = yield validarImagen(imageUrl);
-                        if (!esValida) {
-                            // Si no es válida, usar imagen por defecto (si existe)
-                            const feedsTxt = yield fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
-                            const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
-                            const feedDefault = lines.find(line => line.includes(feedUrl));
-                            if (feedDefault) {
-                                const parts = feedDefault.split(",");
-                                imageUrl = parts[2] || "";
-                            }
-                        }
-                        let storedData = storedDataJson ? JSON.parse(storedDataJson) : [];
-                        storedData.push({ host, title, link, imageUrl, pubDate, type: type });
-                        localStorage.setItem("feedsHistory", JSON.stringify(storedData));
-                    }
-                }
-                catch (err) {
-                    console.error("Error guardando feedsHistory en localStorage:", err);
-                }
-            }
+            console.log(JSON.stringify({ title, link, imageUrl, pubDate }));
             return { title, link, imageUrl, pubDate };
         }
         catch (error) {
-            console.error("Error cargando feed:", feedUrl, error);
+            console.error("Error loading feed:", feedUrl, error);
             return null;
         }
     });
@@ -140,19 +80,21 @@ function formatDate(date) {
 }
 function loadFeeds() {
     return __awaiter(this, void 0, void 0, function* () {
+        var _a, _b, _c;
         try {
             // Contenedor donde se generarán los feeds
             const container = document.getElementById("feeds-container");
             if (!container)
                 return;
+            const selectedCategory = (_a = document.getElementById("categorySelect")) === null || _a === void 0 ? void 0 : _a.value;
+            const selectedCountry = (_b = document.getElementById("countrySelect")) === null || _b === void 0 ? void 0 : _b.value;
+            const selectedLanguage = (_c = document.getElementById("languageSelect")) === null || _c === void 0 ? void 0 : _c.value;
             container.style.display = "none";
             const loading = document.getElementById("loading-container");
             if (loading)
                 loading.style.display = "block"; // mostrar spinner
-            // Leer feeds.txt
             const feedsTxt = yield fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
             const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
-            // 🔹 Obtener los votos desde el backend
             let votesData = [];
             try {
                 const votesResponse = yield fetch("https://enterum.alwaysdata.net/getvotes.php?nocache=" + Date.now(), {
@@ -166,22 +108,40 @@ function loadFeeds() {
                 }
             }
             catch (err) {
-                console.error("Error al obtener los votos:", err);
+                console.error("Error getting votes:", err);
             }
             let feedsWithImages = lines.map(line => {
-                const [title, url, defaultImage, type, useDescription] = line.split(",");
+                const parts = line.split(",");
+                const [title, url, defaultImage, type, useDescription, category, country, language] = parts;
                 const feedVotes = votesData.find(v => v.feed.trim().toLowerCase() === title.trim().toLowerCase());
                 return {
-                    title,
-                    url,
-                    defaultImage,
+                    title: title === null || title === void 0 ? void 0 : title.trim(),
+                    url: url === null || url === void 0 ? void 0 : url.trim(),
+                    defaultImage: (defaultImage === null || defaultImage === void 0 ? void 0 : defaultImage.trim()) || "",
                     type: (type || "rss").trim().toLowerCase(),
                     useDescriptionForImage: (useDescription === null || useDescription === void 0 ? void 0 : useDescription.trim().toLowerCase()) === "true",
+                    category: (category === null || category === void 0 ? void 0 : category.trim()) || "",
+                    country: (country === null || country === void 0 ? void 0 : country.trim()) || "",
+                    language: (language === null || language === void 0 ? void 0 : language.trim()) || "",
                     votes: feedVotes ? feedVotes.votes : 0
                 };
             });
+            feedsWithImages = feedsWithImages.filter(feed => {
+                const matchCategory = !selectedCategory || feed.category === selectedCategory;
+                const matchCountry = !selectedCountry || selectedCountry === "" || feed.country === selectedCountry;
+                const matchLanguage = !selectedLanguage || feed.language === selectedLanguage;
+                return matchCategory && matchCountry && matchLanguage;
+            });
+            if (!feedsWithImages || feedsWithImages.length === 0) {
+                if (container) {
+                    container.innerHTML = `<p style="text-align:center; font-weight:bold; margin-top:20px;">${t("noFeeds")}</p>`;
+                    container.style.display = "block";
+                }
+                if (loading)
+                    loading.style.display = "none"; // ocultar spinner
+                return;
+            }
             feedsWithImages.sort((a, b) => b.votes - a.votes);
-            // Limpiar solo este contenedor
             container.innerHTML = "";
             const itemsPerRow = 3;
             for (let i = 0; i < feedsWithImages.length; i += itemsPerRow) {
@@ -202,7 +162,6 @@ function loadFeeds() {
                 }
                 container.appendChild(rowDiv);
             }
-            // Obtener items
             const items = yield Promise.all(feedsWithImages.map(feed => getFirstItem(feed.url, feed.type, feed.useDescriptionForImage)));
             // Actualizar contenido de cada feed
             items.forEach((feedItem, index) => {
@@ -211,7 +170,24 @@ function loadFeeds() {
                 if (!container)
                     return;
                 if (!feedItem) {
-                    container.style.display = 'none';
+                    const feed = feedsWithImages[index];
+                    const linkEl = container.querySelector("a");
+                    const imgEl = container.querySelector("img");
+                    const titleEl = container.querySelector("p a");
+                    const pubDateEl = container.querySelector("p.pubdate");
+                    if (linkEl)
+                        linkEl.href = "#";
+                    if (imgEl)
+                        imgEl.src = "http://enterum.github.io/aggrhome/img/carta-ajuste.png";
+                    if (titleEl) {
+                        titleEl.textContent = t("feedTechnicalIssues");
+                        titleEl.href = "#";
+                    }
+                    if (pubDateEl)
+                        pubDateEl.textContent = "";
+                    const h3El = container.querySelector("h3");
+                    if (h3El)
+                        h3El.textContent = feed.title;
                     return;
                 }
                 const feed = feedsWithImages[index];
@@ -219,11 +195,8 @@ function loadFeeds() {
                 const imgEl = container.querySelector("img");
                 const titleEl = container.querySelector("p a");
                 const pubDateEl = container.querySelector("p.pubdate");
-                let finalImage = feedsWithImages[index].defaultImage;
                 validarImagen(feedItem.imageUrl).then(esValida => {
-                    finalImage = esValida
-                        ? feedItem.imageUrl
-                        : feedsWithImages[index].defaultImage;
+                    const finalImage = esValida ? feedItem.imageUrl : feed.defaultImage;
                     if (linkEl)
                         linkEl.href = feedItem.link;
                     if (imgEl)
@@ -235,23 +208,21 @@ function loadFeeds() {
                     if (pubDateEl)
                         pubDateEl.textContent = feedItem.pubDate;
                 });
-                // Dentro del forEach donde ya tienes container definido
                 const commentsToggle = document.createElement("a");
                 commentsToggle.href = "#";
-                commentsToggle.textContent = "🗨️ Comentarios sobre este agregador";
+                commentsToggle.textContent = t("commentsToggle");
                 commentsToggle.style.display = "inline-block";
                 commentsToggle.style.marginTop = "10px";
                 commentsToggle.style.cursor = "pointer";
-                // Div para comentarios, inicialmente oculto
                 const commentsDiv = document.createElement("div");
                 commentsDiv.style.display = "none";
-                commentsDiv.style.height = "300px"; // altura fija
-                commentsDiv.style.overflowY = "auto"; // scroll vertical
+                commentsDiv.style.height = "300px";
+                commentsDiv.style.overflowY = "auto";
                 commentsDiv.style.marginTop = "10px";
                 commentsDiv.style.border = "1px solid #ccc";
                 commentsDiv.style.padding = "10px";
                 commentsDiv.style.borderRadius = "8px";
-                // Toggle para mostrar/ocultar comentarios
+                const issueTerm = getCommentsIssueTerm(feed.title, feed.category, window.PAGE_LANG || "en");
                 commentsToggle.addEventListener("click", (e) => {
                     e.preventDefault();
                     if (commentsDiv.style.display === "none") {
@@ -261,8 +232,8 @@ function loadFeeds() {
                             const script = document.createElement("script");
                             script.src = "https://utteranc.es/client.js";
                             script.async = true;
-                            script.setAttribute("repo", "enterum/feeds-comments"); // tu repo
-                            script.setAttribute("issue-term", `${feed.title}`);
+                            script.setAttribute("repo", "enterum/feeds-comments");
+                            script.setAttribute("issue-term", issueTerm);
                             script.setAttribute("theme", "github-light");
                             script.setAttribute("crossorigin", "anonymous");
                             commentsDiv.appendChild(script);
@@ -272,21 +243,16 @@ function loadFeeds() {
                         commentsDiv.style.display = "none";
                     }
                 });
-                // Añadir al feed
                 container.appendChild(commentsToggle);
                 container.appendChild(commentsDiv);
-                //Nueva funcionalidad 11/11/2025: // Botón de voto 👍
                 const h3El0 = container.querySelector("h3");
-                // Dentro del forEach donde ya tienes h3El
                 if (h3El0) {
-                    // Crear botón 👍
                     const voteBtn = document.createElement("span");
                     voteBtn.style.cursor = "pointer";
                     voteBtn.style.marginLeft = "10px";
-                    voteBtn.title = "Votar este feed";
+                    voteBtn.title = t("voteThisFeed");
                     voteBtn.textContent = '👍';
                     h3El0.appendChild(voteBtn);
-                    // Encontrar (o crear) el span de votos
                     let votesSpan = h3El0.querySelector(".votes-count");
                     if (!votesSpan) {
                         votesSpan = document.createElement("span");
@@ -297,72 +263,68 @@ function loadFeeds() {
                         votesSpan.textContent = `(${(_a = feed.votes) !== null && _a !== void 0 ? _a : 0} votos)`;
                         h3El0.appendChild(votesSpan);
                     }
-                    // Evento click
                     voteBtn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
                         try {
-                            const response = yield fetch(`https://enterum.alwaysdata.net/vote.php?feed=${encodeURIComponent(feed.title)}`);
-                            // 429 → demasiadas peticiones desde esta red
-                            if (response.status === 429) {
-                                Swal.fire({
-                                    icon: "warning",
-                                    title: "Demasiadas peticiones",
-                                    text: "Demasiadas peticiones desde esta red. Inténtelo más tarde.",
+                            // Lanza reCAPTCHA y espera el token
+                            const token = yield new Promise((resolve, reject) => {
+                                if (!window.grecaptcha) {
+                                    reject("reCAPTCHA not loaded");
+                                    return;
+                                }
+                                window.grecaptcha.ready(() => {
+                                    window.grecaptcha.execute("6LdP1BMsAAAAAPuXgNBE_5pJ2WQjc8VafD_A6IMw", { action: "vote" }).then((token) => {
+                                        if (token)
+                                            resolve(token);
+                                        else
+                                            reject("Not valid token fro reCAPTCHA");
+                                    });
                                 });
+                            });
+                            const language = document.getElementById("languageSelect").value;
+                            const category = document.getElementById("categorySelect").value;
+                            const country = document.getElementById("countrySelect").value;
+                            const response = yield fetch('https://enterum.alwaysdata.net/vote.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: new URLSearchParams({
+                                    feed: feed.title,
+                                    language,
+                                    cat: category,
+                                    country,
+                                    captchatoken: token
+                                })
+                            });
+                            if (response.status === 429) {
+                                Swal.fire({ icon: "warning", title: "Ups!", text: t("voteTooMany") });
                                 return;
                             }
-                            // 409 → ya se votó desde esta IP
                             if (response.status === 409) {
-                                Swal.fire({
-                                    icon: "info",
-                                    title: "Voto duplicado",
-                                    text: "Ya se votó desde esta misma IP.",
-                                });
+                                Swal.fire({ icon: "info", title: "Ups!", text: t("voteDuplicate") });
                                 return;
                             }
                             if (response.ok) {
                                 const data = yield response.json();
                                 if (data.success) {
-                                    // Actualizar votos con el valor que devuelve el backend
                                     feed.votes = data.votes;
-                                    votesSpan.textContent = `(${feed.votes} votos)`;
-                                    // ✅ Mostrar mensaje de éxito
-                                    Swal.fire({
-                                        icon: "success",
-                                        title: "¡Gracias!",
-                                        text: "Su voto ha sido contabilizado.",
-                                        timer: 2000,
-                                        showConfirmButton: false,
-                                    });
+                                    votesSpan.textContent = `(${feed.votes} ${t("votes")})`;
+                                    Swal.fire({ icon: "success", title: "OK!", text: t("voteThanks"), timer: 2000, showConfirmButton: false });
                                 }
                                 else {
-                                    console.error("Error al registrar el voto:", data);
-                                    Swal.fire({
-                                        icon: "error",
-                                        title: "Error",
-                                        text: "No se pudo registrar su voto.",
-                                    });
+                                    console.error(t("voteError"), data);
+                                    Swal.fire({ icon: "error", title: "Ups!", text: t("voteError") });
                                 }
                             }
                             else {
-                                console.error("Error al registrar el voto:", response.statusText);
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Error",
-                                    text: `No se pudo registrar el voto. (${response.status})`,
-                                });
+                                console.error(t("voteError") + " " + response.statusText);
+                                Swal.fire({ icon: "error", title: "Ups!", text: t("voteError") + " " + response.status });
                             }
                         }
                         catch (err) {
-                            console.error("Error de red al votar:", err);
-                            Swal.fire({
-                                icon: "error",
-                                title: "Error de conexión",
-                                text: "No se pudo conectar con el servidor.",
-                            });
+                            console.error(t("voteError"), err);
+                            Swal.fire({ icon: "error", title: "Ups!", text: t("voteError") });
                         }
                     }));
                 }
-                // Nueva funcionalidad 05/11/2025: Mostrar histórico:
                 const h3El = container.querySelector("h3");
                 if (h3El) {
                     const emoji = ((_b = h3El.textContent) === null || _b === void 0 ? void 0 : _b.includes("🕒")) ? h3El.querySelector("span") : null;
@@ -372,13 +334,12 @@ function loadFeeds() {
                         emojiEl.style.cursor = "pointer";
                         emojiEl.style.marginLeft = "5px";
                         emojiEl.textContent = "🕒";
-                        emojiEl.title = "Ver historial de noticias";
+                        emojiEl.title = t("viewHistory");
                         h3El.appendChild(emojiEl);
                     }
                     else {
                         emojiEl = emoji;
                     }
-                    // NUEVO: Emoji de compartir 🔗
                     let emojiShare = h3El.querySelector(".share");
                     if (!emojiShare) {
                         emojiShare = document.createElement("span");
@@ -386,12 +347,15 @@ function loadFeeds() {
                         emojiShare.style.cursor = "pointer";
                         emojiShare.style.marginLeft = "5px";
                         emojiShare.textContent = "🔗";
-                        emojiShare.title = "Compartir esta noticia";
+                        emojiShare.title = t("sharethisnews");
                         h3El.appendChild(emojiShare);
-                        // Evento de click del compartir
                         emojiShare.addEventListener("click", () => {
                             if (!navigator.share) {
-                                alert("Tu navegador no soporta compartir");
+                                Swal.fire({
+                                    icon: "warning",
+                                    title: "Ups!",
+                                    text: t("shareFailed"),
+                                });
                                 return;
                             }
                             navigator.share({
@@ -399,8 +363,12 @@ function loadFeeds() {
                                 text: feedItem.title, // titular de la noticia
                                 url: feedItem.link, // url de la noticia
                             })
-                                .then(() => console.log('Compartido con éxito'))
-                                .catch((error) => console.log('Error al compartir', error));
+                                .then(() => console.log("shared!")) //lo vamos a dejar como aviso en la consola, no tiene mucho sentido sacar un Swal aquí
+                                .catch((error) => Swal.fire({
+                                icon: "error",
+                                title: "Ups!",
+                                text: t("shareError"),
+                            }));
                         });
                     }
                     emojiEl.addEventListener("click", () => {
@@ -416,11 +384,10 @@ function loadFeeds() {
                             const host = urlObj.host;
                             const filtered = storedData.filter(item => item.host === host);
                             filtered.sort((a, b) => (a.pubDate < b.pubDate ? 1 : a.pubDate > b.pubDate ? -1 : 0));
-                            // Título centrado
                             const h3 = document.createElement("h3");
-                            h3.textContent = `Historial de noticias de ${feed.title} hasta el momento:`;
+                            h3.textContent = t("historyTitle") + " " + feed.title + ":";
                             h3.style.textAlign = "center";
-                            h3.style.marginBottom = "20px"; // opcional para separar de la tabla
+                            h3.style.marginBottom = "20px";
                             historyContainer.appendChild(h3);
                             const table = document.createElement("table");
                             table.style.width = "100%";
@@ -460,31 +427,33 @@ function loadFeeds() {
                             });
                             historyContainer.appendChild(table);
                             historyContainer.style.display = "block";
-                            // Hacer scroll hacia el historial
                             const rect = historyContainer.getBoundingClientRect();
                             const scrollTop = window.scrollY + rect.top - 100;
                             window.scrollTo({ top: scrollTop, behavior: "smooth" });
                         }
                         catch (err) {
-                            console.error("Error mostrando historial:", err);
+                            console.error("Error showing history:", err);
                         }
                     });
                 }
             });
-            // Ocultar spinner una vez cargados los feeds
             if (loading)
                 loading.style.display = "none";
             container.style.display = "block";
             saveHistorial(true, 5);
         }
         catch (error) {
-            console.error("Error leyendo feeds.txt o actualizando DOM:", error);
+            console.error("Error reading feeds.txt or updating DOM:", error);
         }
     });
 }
 function saveHistorial() {
     return __awaiter(this, arguments, void 0, function* (useDescriptionForImage = false, maxConcurrent = 5) {
+        var _a, _b, _c;
         try {
+            const selectedCategory = (_a = document.getElementById("categorySelect")) === null || _a === void 0 ? void 0 : _a.value;
+            const selectedCountry = (_b = document.getElementById("countrySelect")) === null || _b === void 0 ? void 0 : _b.value;
+            const selectedLanguage = (_c = document.getElementById("languageSelect")) === null || _c === void 0 ? void 0 : _c.value;
             const feedsTxt = yield fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
             const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line && !line.startsWith("#"));
             const feeds = lines.map(line => {
@@ -495,7 +464,10 @@ function saveHistorial() {
                     url: (_b = parts[1]) === null || _b === void 0 ? void 0 : _b.trim(),
                     defaultImage: ((_c = parts[2]) === null || _c === void 0 ? void 0 : _c.trim()) || "",
                     type: (((_d = parts[3]) === null || _d === void 0 ? void 0 : _d.trim()) || "rss").toLowerCase(),
-                    useDescriptionForImage: (((_e = parts[4]) === null || _e === void 0 ? void 0 : _e.trim().toLowerCase()) === "true") // <-- nueva propiedad
+                    useDescriptionForImage: (((_e = parts[4]) === null || _e === void 0 ? void 0 : _e.trim().toLowerCase()) === "true"),
+                    category: parts[5],
+                    country: parts[6],
+                    language: parts[7]
                 };
             });
             const storedDataJson = localStorage.getItem("feedsHistory");
@@ -518,71 +490,70 @@ function saveHistorial() {
                         (() => __awaiter(this, void 0, void 0, function* () {
                             var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
                             try {
-                                const response = yield fetchWithTimeout(`https://corsproxy.io/?${encodeURIComponent(feed.url)}`, { cache: "no-store" });
-                                const xmlText = yield response.text();
-                                const parser = new DOMParser();
-                                const xml = parser.parseFromString(xmlText, "application/xml");
-                                const isAtom = feed.url.includes("reddit.com");
-                                const items = isAtom ? Array.from(xml.querySelectorAll("entry")) : Array.from(xml.querySelectorAll("item"));
-                                for (const item of items) {
-                                    const title = (_b = (_a = item.querySelector("title")) === null || _a === void 0 ? void 0 : _a.textContent) !== null && _b !== void 0 ? _b : "";
-                                    let link = "";
-                                    if (isAtom)
-                                        link = (_d = (_c = item.querySelector("link")) === null || _c === void 0 ? void 0 : _c.getAttribute("href")) !== null && _d !== void 0 ? _d : "";
-                                    else
-                                        link = (_f = (_e = item.querySelector("link")) === null || _e === void 0 ? void 0 : _e.textContent) !== null && _f !== void 0 ? _f : "";
-                                    if (!link)
-                                        continue;
-                                    // Imagen
-                                    let imageUrl = "";
-                                    if (isAtom) {
-                                        const content = (_h = (_g = item.querySelector("content")) === null || _g === void 0 ? void 0 : _g.textContent) !== null && _h !== void 0 ? _h : "";
-                                        const imgMatch = content.match(/<img[^>]+src=['"]([^'"]+)['"]/);
-                                        if (imgMatch)
-                                            imageUrl = imgMatch[1];
-                                    }
-                                    else {
-                                        const media = item.querySelector("media\\:content, enclosure");
-                                        if (media)
-                                            imageUrl = (_j = media.getAttribute("url")) !== null && _j !== void 0 ? _j : "";
-                                    }
-                                    if (!imageUrl && useDescriptionForImage) {
-                                        const description = (_l = (_k = item.querySelector("description")) === null || _k === void 0 ? void 0 : _k.textContent) !== null && _l !== void 0 ? _l : "";
-                                        const match = description.match(/<img[^>]+src=['"]([^'"]+)['"]/);
-                                        if (match)
-                                            imageUrl = match[1];
-                                    }
-                                    // Fecha
-                                    let pubDate = "";
-                                    if (isAtom) {
-                                        const updatedRaw = (_o = (_m = item.querySelector("updated")) === null || _m === void 0 ? void 0 : _m.textContent) !== null && _o !== void 0 ? _o : "";
-                                        if (updatedRaw)
-                                            pubDate = formatDate(new Date(updatedRaw));
-                                    }
-                                    else {
-                                        const pubDateRaw = (_q = (_p = item.querySelector("pubDate")) === null || _p === void 0 ? void 0 : _p.textContent) !== null && _q !== void 0 ? _q : "";
-                                        const pubDateObj = pubDateRaw ? new Date(pubDateRaw) : null;
-                                        pubDate = pubDateObj ? formatDate(pubDateObj) : "";
-                                    }
-                                    try {
-                                        const urlObj = new URL(link);
-                                        const host = urlObj.host;
-                                        const exists = storedData.some(i => i.link === link);
-                                        if (exists)
+                                if (feed.language == selectedLanguage && feed.category === selectedCategory && (selectedCountry === "" || feed.country === selectedCountry)) {
+                                    const response = yield fetchWithTimeout(`https://corsproxy.io/?${encodeURIComponent(feed.url)}`, { cache: "no-store" });
+                                    const xmlText = yield response.text();
+                                    const parser = new DOMParser();
+                                    const xml = parser.parseFromString(xmlText, "application/xml");
+                                    const isAtom = feed.type === "atom";
+                                    const items = isAtom ? Array.from(xml.querySelectorAll("entry")) : Array.from(xml.querySelectorAll("item"));
+                                    for (const item of items) {
+                                        const title = (_b = (_a = item.querySelector("title")) === null || _a === void 0 ? void 0 : _a.textContent) !== null && _b !== void 0 ? _b : "";
+                                        let link = "";
+                                        if (isAtom)
+                                            link = (_d = (_c = item.querySelector("link")) === null || _c === void 0 ? void 0 : _c.getAttribute("href")) !== null && _d !== void 0 ? _d : "";
+                                        else
+                                            link = (_f = (_e = item.querySelector("link")) === null || _e === void 0 ? void 0 : _e.textContent) !== null && _f !== void 0 ? _f : "";
+                                        if (!link)
                                             continue;
-                                        // Validar imagen
-                                        const esValida = yield validarImagen(imageUrl);
-                                        if (!esValida)
-                                            imageUrl = feed.defaultImage || "";
-                                        storedData.push({ host, title, link, imageUrl, pubDate, type: feed.type, fromDescription: feed.useDescriptionForImage });
-                                    }
-                                    catch (err) {
-                                        console.error("Error guardando item en localStorage:", err);
+                                        let imageUrl = "";
+                                        if (isAtom) {
+                                            const content = (_h = (_g = item.querySelector("content")) === null || _g === void 0 ? void 0 : _g.textContent) !== null && _h !== void 0 ? _h : "";
+                                            const imgMatch = content.match(/<img[^>]+src=['"]([^'"]+)['"]/);
+                                            if (imgMatch)
+                                                imageUrl = imgMatch[1];
+                                        }
+                                        else {
+                                            const media = item.querySelector("media\\:content, enclosure");
+                                            if (media)
+                                                imageUrl = (_j = media.getAttribute("url")) !== null && _j !== void 0 ? _j : "";
+                                        }
+                                        if (!imageUrl && useDescriptionForImage) {
+                                            const description = (_l = (_k = item.querySelector("description")) === null || _k === void 0 ? void 0 : _k.textContent) !== null && _l !== void 0 ? _l : "";
+                                            const match = description.match(/<img[^>]+src=['"]([^'"]+)['"]/);
+                                            if (match)
+                                                imageUrl = match[1];
+                                        }
+                                        let pubDate = "";
+                                        if (isAtom) {
+                                            const updatedRaw = (_o = (_m = item.querySelector("updated")) === null || _m === void 0 ? void 0 : _m.textContent) !== null && _o !== void 0 ? _o : "";
+                                            if (updatedRaw)
+                                                pubDate = formatDate(new Date(updatedRaw));
+                                        }
+                                        else {
+                                            const pubDateRaw = (_q = (_p = item.querySelector("pubDate")) === null || _p === void 0 ? void 0 : _p.textContent) !== null && _q !== void 0 ? _q : "";
+                                            const pubDateObj = pubDateRaw ? new Date(pubDateRaw) : null;
+                                            pubDate = pubDateObj ? formatDate(pubDateObj) : "";
+                                        }
+                                        try {
+                                            const urlObj = new URL(link);
+                                            const host = urlObj.host;
+                                            const exists = storedData.some(i => i.link === link);
+                                            if (exists)
+                                                continue;
+                                            const esValida = yield validarImagen(imageUrl);
+                                            if (!esValida)
+                                                imageUrl = feed.defaultImage || "";
+                                            storedData.push({ host, title, link, imageUrl, pubDate, type: feed.type, fromDescription: feed.useDescriptionForImage });
+                                        }
+                                        catch (err) {
+                                            console.error("Error saving item in localStorage:", err);
+                                        }
                                     }
                                 }
                             }
                             catch (err) {
-                                console.error("Error procesando feed:", feed.url, err);
+                                console.error("Error processing feed:", feed.url, err);
                             }
                             finally {
                                 active--;
@@ -595,7 +566,7 @@ function saveHistorial() {
             });
         }
         catch (err) {
-            console.error("Error general en saveHistorial:", err);
+            console.error("Error general in saveHistorial:", err);
         }
     });
 }
@@ -619,7 +590,17 @@ function startAutoRefresh(intervalMs) {
     }
 }
 document.addEventListener("DOMContentLoaded", () => {
-    loadFeeds();
+    const PAGE_LANG = window.PAGE_LANG || "en";
+    loadCategories().then(() => {
+        const languageSelect = document.getElementById("languageSelect");
+        if (languageSelect) {
+            languageSelect.value = PAGE_LANG;
+            // Deshabilita la opción correspondiente al idioma actual
+            const option = languageSelect.querySelector(`#languageSelect option[value="${PAGE_LANG}"]`);
+            if (option)
+                option.disabled = true;
+        }
+    });
     const dt = new Date();
     const footer = document.getElementById("getCurrentDate");
     if (footer)
@@ -633,8 +614,52 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     else {
-        console.error("No se encontró el select de refresco");
+        console.error("No refresh select found");
     }
+    const form = document.getElementById("addFeedForm");
+    form.addEventListener("submit", (event) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
+        event.preventDefault();
+        const submitBtn = document.getElementById("submitFeedBtn");
+        submitBtn.disabled = true;
+        try {
+            const formData = new FormData(form);
+            const response = yield fetch(form.action, {
+                method: "POST",
+                body: formData
+            });
+            const status = response.status;
+            let json = null;
+            if ((_a = response.headers.get("content-type")) === null || _a === void 0 ? void 0 : _a.includes("application/json")) {
+                json = yield response.json();
+            }
+            if (response.ok) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Ok!",
+                    text: t("addFeedSuccess"),
+                });
+            }
+            else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Ups!",
+                    text: t("addFeedError"),
+                });
+            }
+        }
+        catch (error) {
+            console.error(t("connectionError"), error);
+            Swal.fire({
+                icon: "error",
+                title: "Ups!",
+                text: t("connectionError"),
+            });
+        }
+        finally {
+            submitBtn.disabled = false;
+        }
+    }));
 });
 function fetchWithTimeout(url_1) {
     return __awaiter(this, arguments, void 0, function* (url, options = {}, timeoutMs = 3000) {
@@ -648,4 +673,207 @@ function fetchWithTimeout(url_1) {
             clearTimeout(id);
         }
     });
+}
+function loadCategories() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const PAGE_LANG = window.PAGE_LANG || "en";
+            const response = yield fetch("categories.txt", { cache: "no-store" });
+            const text = yield response.text();
+            const lines = text
+                .split("\n")
+                .map(l => l.trim())
+                .filter(l => l && !l.startsWith("#"));
+            allCategories = lines.map(line => {
+                var _a, _b, _c, _d, _e, _f, _g, _h;
+                const parts = line.split("|");
+                return {
+                    code: ((_a = parts[0]) === null || _a === void 0 ? void 0 : _a.trim()) || "",
+                    name: ((_b = parts[1]) === null || _b === void 0 ? void 0 : _b.trim()) || "",
+                    description: ((_c = parts[2]) === null || _c === void 0 ? void 0 : _c.trim()) || "",
+                    subdescription: ((_d = parts[3]) === null || _d === void 0 ? void 0 : _d.trim()) || "",
+                    countryCode: ((_e = parts[4]) === null || _e === void 0 ? void 0 : _e.trim()) || "",
+                    countryName: ((_f = parts[5]) === null || _f === void 0 ? void 0 : _f.trim()) || "",
+                    languageCode: ((_g = parts[6]) === null || _g === void 0 ? void 0 : _g.trim()) || "",
+                    languageName: ((_h = parts[7]) === null || _h === void 0 ? void 0 : _h.trim()) || ""
+                };
+            });
+            const categorySelect = document.getElementById("categorySelect");
+            const countrySelect = document.getElementById("countrySelect");
+            const languageSelect = document.getElementById("languageSelect");
+            if (!categorySelect || !countrySelect || !languageSelect)
+                return;
+            const languages = Array.from(new Map(allCategories.map(cat => [cat.languageCode, cat.languageName])));
+            languages.sort((a, b) => a[1].localeCompare(b[1]));
+            languageSelect.innerHTML = "";
+            languages.forEach(([code, name]) => {
+                const opt = document.createElement("option");
+                opt.value = code;
+                opt.textContent = name;
+                languageSelect.appendChild(opt);
+            });
+            const { lang, country, cat } = getUrlParams();
+            console.log("lang=[" + lang + "]");
+            console.log("cat=[" + cat + "]");
+            console.log("country=[" + country + "]");
+            languageSelect.value = lang;
+            localStorage.setItem("selectedLanguage", lang);
+            const reloadCategoriesAndCountries = (selectedLang) => {
+                var _a, _b;
+                const filteredCategories = allCategories.filter(cat => cat.languageCode === selectedLang);
+                const uniqueCategories = Array.from(new Map(filteredCategories.map(cat => [cat.code, cat])).values());
+                uniqueCategories.sort((a, b) => a.name.localeCompare(b.name));
+                categorySelect.innerHTML = "";
+                uniqueCategories.forEach(cat => {
+                    const opt = document.createElement("option");
+                    opt.value = cat.code;
+                    opt.textContent = cat.name;
+                    categorySelect.appendChild(opt);
+                });
+                const selectedCategory = cat ||
+                    localStorage.getItem("selectedCategory") ||
+                    ((_a = uniqueCategories[0]) === null || _a === void 0 ? void 0 : _a.code) ||
+                    "";
+                categorySelect.value = selectedCategory;
+                localStorage.setItem("selectedCategory", selectedCategory);
+                const countriesMap = new Map();
+                filteredCategories.forEach(cat => countriesMap.set(cat.countryCode, cat.countryName));
+                countrySelect.innerHTML = "";
+                const defaultOpt = document.createElement("option");
+                defaultOpt.value = "";
+                defaultOpt.textContent = t("allCountries");
+                countrySelect.appendChild(defaultOpt);
+                const countryList = Array.from(countriesMap.entries());
+                countryList.sort((a, b) => a[1].localeCompare(b[1]));
+                countriesMap.forEach((name, code) => {
+                    const opt = document.createElement("option");
+                    opt.value = code;
+                    opt.textContent = name;
+                    countrySelect.appendChild(opt);
+                });
+                let selectedCountry = "";
+                if (country && country !== "") {
+                    selectedCountry =
+                        country ||
+                            localStorage.getItem("selectedCountry") ||
+                            ((_b = countrySelect.options[0]) === null || _b === void 0 ? void 0 : _b.value) ||
+                            "";
+                }
+                countrySelect.value = selectedCountry;
+                localStorage.setItem("selectedCountry", selectedCountry);
+                updateCategoryHeader();
+                if (!firstLoad) {
+                    loadFeeds();
+                }
+            };
+            reloadCategoriesAndCountries(lang);
+            loadFeeds();
+            firstLoad = false;
+            updateCategoryHeader();
+            languageSelect.addEventListener("change", () => {
+                const selectedLang = languageSelect.value;
+                const selectedCountry = ''; //porque puede no existir en otro idioma, así que ponemos "Todos los países"
+                const selectedCategory = categorySelect.value;
+                const targetUrl = `index-${selectedLang}.html?lang=${selectedLang}&country=${encodeURIComponent(selectedCountry)}&cat=${encodeURIComponent(selectedCategory)}`;
+                window.location.href = targetUrl;
+            });
+            categorySelect.addEventListener("change", () => {
+                localStorage.setItem("selectedCountry", countrySelect.value);
+                localStorage.setItem("selectedCategory", categorySelect.value);
+                updateCategoryHeader();
+                loadFeeds();
+            });
+            countrySelect.addEventListener("change", () => {
+                localStorage.setItem("selectedCountry", countrySelect.value);
+                localStorage.setItem("selectedCategory", categorySelect.value);
+                updateCategoryHeader();
+                loadFeeds();
+            });
+        }
+        catch (err) {
+            console.error("Error loading categories.txt:", err);
+        }
+    });
+}
+function updateCategoryHeader() {
+    var _a, _b;
+    const selectedCategoryCode = (_a = document.getElementById("categorySelect")) === null || _a === void 0 ? void 0 : _a.value;
+    if (!selectedCategoryCode)
+        return;
+    const selectedLanguageCode = (_b = document.getElementById("languageSelect")) === null || _b === void 0 ? void 0 : _b.value;
+    if (!selectedLanguageCode)
+        return;
+    const category = allCategories.find(cat => cat.code === selectedCategoryCode && cat.languageCode == selectedLanguageCode);
+    if (!category)
+        return;
+    const catTitleEl = document.getElementById("cattitle");
+    const catSubtitleEl = document.getElementById("catsubtitle");
+    if (catTitleEl)
+        catTitleEl.textContent = category.description;
+    if (catSubtitleEl)
+        catSubtitleEl.textContent = category.subdescription;
+}
+function getUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+        lang: window.PAGE_LANG || "en",
+        country: params.get("country") || "",
+        cat: params.get("cat") || "AGR"
+    };
+}
+const i18n = {
+    en: {
+        noFeeds: "No feeds match the selected filters.",
+        addFeedSuccess: "Feed added successfully (will be moderated before publishing).",
+        addFeedError: "Error adding the feed.",
+        connectionError: "Connection error.",
+        voteThanks: "Thank you! Your vote has been counted.",
+        voteDuplicate: "You have already voted from this IP.",
+        voteTooMany: "Too many requests from this network. Try later.",
+        voteError: "Could not register your vote.",
+        shareError: "Cannot share this news.",
+        shareFailed: "Could not share the news.",
+        historyTitle: "News history for",
+        allCountries: "All countries",
+        sharethisnews: "Share this news",
+        voteThisFeed: "Vote this feed",
+        viewHistory: "View news history",
+        commentsToggle: "🗨️ Comments on this feed",
+        feedTechnicalIssues: "This feed is experiencing technical issues",
+        votes: "votes"
+    },
+    es: {
+        noFeeds: "No hay feeds que coincidan con los filtros seleccionados.",
+        addFeedSuccess: "Feed agregado correctamente al directorio (se moderará antes de publicarlo).",
+        addFeedError: "Hubo un error al añadir el feed.",
+        connectionError: "Error de conexión.",
+        voteThanks: "¡Gracias! Su voto ha sido contabilizado.",
+        voteDuplicate: "Ya se votó desde esta misma IP.",
+        voteTooMany: "Demasiadas peticiones desde esta red. Inténtelo más tarde.",
+        voteError: "No se pudo registrar su voto.",
+        shareError: "No se puede compartir esta noticia.",
+        shareFailed: "No se pudo compartir la noticia.",
+        historyTitle: "Historial de noticias de",
+        allCountries: "Todos los países",
+        sharethisnews: "Compartir esta noticia",
+        voteThisFeed: "Votar este feed",
+        viewHistory: "Ver historial de noticias",
+        commentsToggle: "🗨️ Comentarios sobre este feed",
+        feedTechnicalIssues: "Este feed está teniendo problemas técnicos",
+        votes: "votos"
+    }
+};
+function t(key) {
+    var _a;
+    const lang = (window.PAGE_LANG || "en");
+    if (!i18n[lang])
+        return key;
+    return (_a = i18n[lang][key]) !== null && _a !== void 0 ? _a : key;
+}
+function getCommentsIssueTerm(feedTitle, category, lang) {
+    // Si es español y agregadores, dejamos solo el título (manteniendo compatibilidad con los comentarios existentes)
+    if (lang === "es" && category === 'AGR')
+        return feedTitle;
+    // Para otros idiomas, añadimos categoría y código de idioma
+    return `${feedTitle}-${category}-${lang}`;
 }

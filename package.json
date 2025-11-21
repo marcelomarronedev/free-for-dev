@@ -1,7 +1,7 @@
 {
   "name": "aggrhome",
   "version": "1.0.0",
-  "description": "AGGRHOME 🌐 - Portadas de los principales agregadores de noticias en español",
+  "description": "FEEDSHOME – Your Global Feeds Directory",
   "main": "dist/main.js",
   "scripts": {
     "clean": "rimraf docs/dist",

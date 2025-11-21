@@ -1,0 +1,67 @@
+AGR|Agregadores de noticias|Portadas de los principales agregadores de noticias en español|Vota cada agregador pensando en la calidad de las noticias que ofrecen: El número de votos determinará el orden en el listado.|ES|España|es|Español
+AGR|News Aggregators|Front pages of the main news aggregators|Vote for each aggregator based on the quality of the news they provide: The number of votes will determine the order in the list.|US|United States|en|English
+AGR|News Aggregators|Front pages of the main language news aggregators|Vote for each aggregator based on the quality of the news they provide: The number of votes will determine the order in the list.|UK|United Kingdom|en|English
+
+PON|Prensa online|Principales diarios online en español|Vota cada medio pensando en la calidad y relevancia de sus noticias: El número de votos determinará el orden en el listado.|ES|España|es|Español
+PON|Online Press|Main online newspapers|Vote for each outlet based on the quality and relevance of their news: The number of votes will determine the order in the list.|US|United States|en|English
+PON|Online Press|Main online newspapers|Vote for each outlet based on the quality and relevance of their news: The number of votes will determine the order in the list.|UK|United Kingdom|en|English
+
+BLOG|Blogs|Los principales blogs de actualidad, opinión y temas específicos|Vota cada blog según la calidad del contenido y relevancia de sus publicaciones.|ES|España|es|Español
+BLOG|Blogs|The main blogs covering news, opinion, and specific topics|Vote for each blog based on content quality and relevance of posts.|US|United States|en|English
+BLOG|Blogs|The main blogs covering news, opinion, and specific topics|Vote for each blog based on content quality and relevance of posts.|UK|United Kingdom|en|English
+
+REV|Revistas online|Revistas digitales con noticias, entrevistas y artículos de opinión|Evalúa cada revista según la calidad editorial y la relevancia de sus artículos.|ES|España|es|Español
+REV|Online Magazines|Digital magazines with news, interviews, and opinion articles|Rate based on editorial quality and relevance of articles.|US|United States|en|English
+REV|Online Magazines|Digital magazines with news, interviews, and opinion articles|Rate based on editorial quality and relevance of articles.|UK|United Kingdom|en|English
+
+TEC|Tecnología|Webs de noticias y artículos sobre tecnología, gadgets y ciencia|Vota según la actualidad y calidad del contenido tecnológico.|ES|España|es|Español
+TEC|Technology|Websites with news and articles about technology, gadgets and science|Vote based on relevance and quality of tech content.|US|United States|en|English
+TEC|Technology|Websites with news and articles about technology, gadgets and science|Vote based on relevance and quality of tech content.|UK|United Kingdom|en|English
+
+ENT|Entretenimiento|Portales de cine, series, música y cultura pop|Evalúa según la calidad de las noticias y artículos de entretenimiento.|ES|España|es|Español
+ENT|Entertainment|Portals about movies, series, music and pop culture|Rate based on the quality of news and entertainment articles.|US|United States|en|English
+ENT|Entertainment|Portals about movies, series, music and pop culture|Rate based on the quality of news and entertainment articles.|UK|United Kingdom|en|English
+
+DEP|Deportes|Medios dedicados a noticias deportivas y resultados|Vota según la cobertura y relevancia de las noticias deportivas.|ES|España|es|Español
+DEP|Sports|Media outlets focused on sports news and results|Vote based on coverage and relevance of sports news.|US|United States|en|English
+DEP|Sports|Media outlets focused on sports news and results|Vote based on coverage and relevance of sports news.|UK|United Kingdom|en|English
+
+CIU|Ciencia|Webs dedicadas a la divulgación científica y descubrimientos|Evalúa la calidad y claridad de los contenidos científicos.|ES|España|es|Español
+CIU|Science|Websites dedicated to science communication and discoveries|Rate based on clarity and quality of scientific content.|US|United States|en|English
+CIU|Science|Websites dedicated to science communication and discoveries|Rate based on clarity and quality of scientific content.|UK|United Kingdom|en|English
+
+POL|Política|Medios especializados en política nacional e internacional|Vota según la profundidad y relevancia de la cobertura política.|ES|España|es|Español
+POL|Politics|Media outlets specialized in national and international politics|Vote based on depth and relevance of political coverage.|US|United States|en|English
+POL|Politics|Media outlets specialized in national and international politics|Vote based on depth and relevance of political coverage.|UK|United Kingdom|en|English
+
+ECO|Economía|Portales de economía, finanzas y negocios|Evalúa según la exactitud y relevancia de las noticias económicas.|ES|España|es|Español
+ECO|Economy|Websites covering economy, finance and business|Rate based on accuracy and relevance of economic news.|US|United States|en|English
+ECO|Economy|Websites covering economy, finance and business|Rate based on accuracy and relevance of economic news.|UK|United Kingdom|en|English
+
+VIA|Viajes|Webs de noticias y guías sobre destinos turísticos|Vota según la utilidad y calidad de la información sobre viajes.|ES|España|es|Español
+VIA|Travel|Websites with news and guides about travel destinations|Vote based on usefulness and quality of travel information.|US|United States|en|English
+VIA|Travel|Websites with news and guides about travel destinations|Vote based on usefulness and quality of travel information.|UK|United Kingdom|en|English
+
+GAS|Gastronomía|Webs y blogs sobre cocina, recetas y restaurantes|Evalúa según la creatividad y calidad de los contenidos gastronómicos.|ES|España|es|Español
+GAS|Gastronomy|Websites and blogs about cooking, recipes and restaurants|Rate based on creativity and quality of gastronomic content.|US|United States|en|English
+GAS|Gastronomy|Websites and blogs about cooking, recipes and restaurants|Rate based on creativity and quality of gastronomic content.|UK|United Kingdom|en|English
+
+SAL|Salud|Medios especializados en medicina, bienestar y salud pública|Vota según la fiabilidad y relevancia de las noticias de salud.|ES|España|es|Español
+SAL|Health|Media outlets specialized in medicine, wellness and public health|Vote based on reliability and relevance of health news.|US|United States|en|English
+SAL|Health|Media outlets specialized in medicine, wellness and public health|Vote based on reliability and relevance of health news.|UK|United Kingdom|en|English
+
+EDU|Educación|Webs sobre enseñanza, formación y educación online|Evalúa la utilidad y calidad de los contenidos educativos.|ES|España|es|Español
+EDU|Education|Websites about teaching, training and online education|Rate based on usefulness and quality of educational content.|US|United States|en|English
+EDU|Education|Websites about teaching, training and online education|Rate based on usefulness and quality of educational content.|UK|United Kingdom|en|English
+
+GAM|Gaming|Portales y blogs sobre videojuegos y cultura gamer|Vota según la actualidad y calidad de las noticias sobre videojuegos.|ES|España|es|Español
+GAM|Gaming|Portals and blogs about video games and gamer culture|Vote based on relevance and quality of gaming news.|US|United States|en|English
+GAM|Gaming|Portals and blogs about video games and gamer culture|Vote based on relevance and quality of gaming news.|UK|United Kingdom|en|English
+
+LIF|Lifestyle|Webs sobre estilo de vida, moda y tendencias|Evalúa según la creatividad y relevancia de los contenidos.|ES|España|es|Español
+LIF|Lifestyle|Websites about lifestyle, fashion and trends|Rate based on creativity and relevance of content.|US|United States|en|English
+LIF|Lifestyle|Websites about lifestyle, fashion and trends|Rate based on creativity and relevance of content.|UK|United Kingdom|en|English
+
+POD|Podcasts|Directorio de podcasts en español y sus notas|Vota según la calidad del contenido y la claridad de los episodios.|ES|España|es|Español
+POD|Podcasts|Directory of podcasts and their notes|Vote based on content quality and clarity of episodes.|US|United States|en|English
+POD|Podcasts|Directory of podcasts and their notes|Vote based on content quality and clarity of episodes.|UK|United Kingdom|en|English

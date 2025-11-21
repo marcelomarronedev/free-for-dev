@@ -1,151 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='25' font-size='25'>🌐</text></svg>">
 
-    <title>AGGRHOME - Portada de los principales agregadores de noticias en español</title>
-    <meta name="description" content="AGGRHOME es un lector de feeds RSS que muestra las portadas de los principales agregadores de noticias en español. La página carga automáticamente los feeds RSS de varios sitios, muestra el primer artículo de cada feed y permite actualizar la información de manera periódica según un intervalo configurable." />
+    <title>FEEDSHOME – Tu directorio global de feeds</title>
+    <meta name="description" content="FEEDSHOME - Descubre, organiza y sigue tus feeds favoritos en un solo lugar. FEEDSHOME te ofrece un directorio completo de feeds agrupados por idioma, país y categoría, para que estés siempre al día con las noticias, blogs y contenidos que más te interesan, sin perder tiempo buscando." />
     <meta name="keywords" content="agregadores de noticias,menéame,killbait,tardigram,mediatize,reddit" />
-    <meta name="author" content="AGGRHOME" />
+    <meta name="author" content="FEEDSHOME" />
 
-    <meta property="og:title" content="AGGRHOME - Portada de los principales agregadores de noticias en español" />
-    <meta property="og:description" content="AGGRHOME es un lector de feeds RSS que muestra las portadas de los principales agregadores de noticias en español. La página carga automáticamente los feeds RSS de varios sitios, muestra el primer artículo de cada feed y permite actualizar la información de manera periódica según un intervalo configurable." />
+    <meta property="og:title" content="FEEDSHOME – Tu directorio global de feeds" />
+    <meta property="og:description" content="FEEDSHOME - Descubre, organiza y sigue tus feeds favoritos en un solo lugar. FEEDSHOME te ofrece un directorio completo de feeds agrupados por idioma, país y categoría, para que estés siempre al día con las noticias, blogs y contenidos que más te interesan, sin perder tiempo buscando." />
     <meta property="og:image" content="https://enterum.github.io/aggrhome/img/image.png" />
     <meta property="og:url" content="https://enterum.github.io/aggrhome/" />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="AGGRHOME" />
+    <meta property="og:site_name" content="FEEDSHOME" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="AGGRHOME - Portada de los principales agregadores de noticias en español" />
-    <meta name="twitter:description" content="AGGRHOME es un lector de feeds RSS que muestra las portadas de los principales agregadores de noticias en español. La página carga automáticamente los feeds RSS de varios sitios, muestra el primer artículo de cada feed y permite actualizar la información de manera periódica según un intervalo configurable." />
+    <meta name="twitter:title" content="FEEDSHOME – Tu directorio global de feeds" />
+    <meta name="twitter:description" content="FEEDSHOME - Descubre, organiza y sigue tus feeds favoritos en un solo lugar. FEEDSHOME te ofrece un directorio completo de feeds agrupados por idioma, país y categoría, para que estés siempre al día con las noticias, blogs y contenidos que más te interesan, sin perder tiempo buscando." />
     <meta name="twitter:image" content="https://enterum.github.io/aggrhome/img/image.png" />
     <meta name="twitter:site" content="@aggrhome" />
 
-    <!-- Bootstrap core CSS -->
-    <link href="css/bootstrap.css" rel="stylesheet">
 
-    <!-- Custom CSS for the '3 Col Portfolio' Template -->
-    <link href="css/3-col-portfolio.css" rel="stylesheet">
-
-    <!-- jQuery (debe ir antes que bootstrap.js) -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-    <!-- Bootstrap JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  </head>
-
-  <body>
-
-<nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
-  <div class="container">
-<div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="https://enterum.github.io/aggrhome/">AGGRHOME 🌐</a>
-        </div>
-
-<div class="collapse navbar-collapse navbar-ex1-collapse">
-  <ul class="nav navbar-nav">
-    <li><a href="#about">Sobre el proyecto</a></li>
-    <li><a target="_blank" href="https://github.com/enterum/aggrhome">Github</a></li>
-    <li><a href="mailto:enterum0@gmail.com">Contacto</a></li>
-  </ul>
-
-  <form class="navbar-form navbar-right" role="form">
-    <div class="form-group">
-      <select id="refreshSelect" class="form-control input-sm">
-        <option value="0">No refrescar nunca</option>
-        <option value="60000">Refrescar cada minuto</option>
-        <option value="300000" selected>Refrescar cada 5 minutos</option>
-        <option value="600000">Refrescar cada 10 minutos</option>
-        <option value="1800000">Refrescar cada 30 minutos</option>
-      </select>
-    </div>
-  </form>
-</div><!-- /.navbar-collapse -->
-
-
-
-
-  </div>
-</nav>
-
-<div class="container mobile-margin-top">
-  <h1 class="page-header">
-    AGGRHOME<small> 🌐 Portadas de los principales agregadores de noticias en español</small>
-    <p style="font-size: 12px; color: #555; margin-top: 5px; font-style: italic;">
-      Vota cada agregador pensando en la calidad de las noticias que ofrecen: El número de votos determinará el orden en el listado.
-    </p>
-  </h1>
-
-  
-  <div style="display:none" id="feeds-container"></div>
-  <div style="display:none" id="history-container"></div>
-
-  <div id="loading-container" style="text-align:center; margin: 20px 0;">
-    <img src="img/loading.gif" alt="Cargando..." id="loading-spinner" style="width: 50px; height: 50px;">
-    <p>Cargando feeds...</p>
-  </div>
-
-
-</div>
-
-<hr>
-<a name="about"></a>
-<h2 style="text-align: center;">Sobre el proyecto</h2>
-<div class="container" id="readme"></div>
-
-<!-- marked.js (CDN) -->
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 40px;
+  }
+  .noscript-container {
+    max-width: 500px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  .lang-list {
+    list-style: none;
+    padding: 0;
+  }
+  .lang-list li {
+    margin: 12px 0;
+  }
+  .lang-btn {
+    display: block;
+    padding: 12px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 18px;
+    transition: background 0.2s;
+  }
+  .lang-btn:hover {
+    background: #0056cc;
+  }
+</style>
 
 <script>
-  async function loadReadme() {
-    try {
-      const response = await fetch('https://raw.githubusercontent.com/enterum/aggrhome/refs/heads/main/README.md', { cache: "no-store" });
-      if (!response.ok) throw new Error('No se pudo cargar el README');
-      const markdown = await response.text();
-      
-      // Renderiza el markdown a HTML
-      const html = marked.parse(markdown);
-      
-      // Inserta en el div
-      document.getElementById('readme').innerHTML = html;
-    } catch (error) {
-      console.error(error);
-      document.getElementById('readme').innerHTML = "<p>Error cargando README.md</p>";
-    }
-  }
+    (function() {
+    
+      const params = new URLSearchParams(window.location.search);
+      const queryLang = params.get("lang");
+    
+      const browserLang = navigator.language || "es-ES";
+      const [langIso, countryIso] = browserLang.split("-");
+    
+      const lang = (queryLang || langIso).substring(0, 2).toLowerCase();
+    
+      const supported = ["es", "en", "fr", "pt", "de", "it"];
+      const finalLang = supported.includes(lang) ? lang : "en";
+    
+      /* Si el navegador trae país -> usarlo, si no -> fallback según idioma
+      const defaultCountry =
+          countryIso ? countryIso.toUpperCase() :
+          finalLang === "es" ? "ES" :
+          finalLang === "en" ? "US" :
+          finalLang.toUpperCase();
+      */
 
-  loadReadme();
+      //Vamos a usar la opción "Todos los países"
+      const defaultCountry = '';
+
+      const defaultCategory = "AGR";
+    
+      window.location.href =
+        `index-${finalLang}.html?country=${defaultCountry}&cat=${defaultCategory}`;
+    })();
 </script>
 
+</head>
+<body>
 
-    <hr>
+<noscript>
+<div class="noscript-container">
+  
+  <ul class="lang-list">
+    <li><a class="lang-btn" href="index-en.html?&country=US&cat=AGR">🇺🇸 English</a></li>
+    <li><a class="lang-btn" href="index-es.html?&country=ES&cat=AGR">🇪🇸 Español</a></li>
+  </ul>
+</div>
+</noscript>
 
-    <div class="container">
-      <footer>
-        <div class="row">
-          <div class="col-lg-12">
-            <p>&copy; AGGRHOME <span id="getCurrentDate"></span> 
-              - Plantilla HTML por <a target="_blank" href="https://github.com/learning-zone/website-templates/tree/master/3-col-portfolio">3-col-portfolio</a>
-              - Proxy CORS por <a target="_blank" href="https://corsproxy.io/">corsproxy.io</a> - Sistema de comentarios por <a target="_blank" href="https://utteranc.es/">utteranc.es</a> 
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div><!-- /.container -->
-
-    <!-- JavaScript -->
-   <script type="module" src="dist/main.js?v=114"></script>
-  </body>
-
+</body>
 </html>
