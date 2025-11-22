@@ -778,12 +778,22 @@ function loadCategories() {
                 window.location.href = targetUrl;
             });
             categorySelect.addEventListener("change", () => {
+                const lang = languageSelect.value;
+                const country = countrySelect.value;
+                const cat = categorySelect.value;
+                const newUrl = `?lang=${lang}&country=${encodeURIComponent(country)}&cat=${encodeURIComponent(cat)}`;
+                history.replaceState(null, "", newUrl);
                 localStorage.setItem("selectedCountry", countrySelect.value);
                 localStorage.setItem("selectedCategory", categorySelect.value);
                 updateCategoryHeader();
                 loadFeeds();
             });
             countrySelect.addEventListener("change", () => {
+                const lang = languageSelect.value;
+                const country = countrySelect.value;
+                const cat = categorySelect.value;
+                const newUrl = `?lang=${lang}&country=${encodeURIComponent(country)}&cat=${encodeURIComponent(cat)}`;
+                history.replaceState(null, "", newUrl);
                 localStorage.setItem("selectedCountry", countrySelect.value);
                 localStorage.setItem("selectedCategory", categorySelect.value);
                 updateCategoryHeader();
