@@ -3,25 +3,29 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='25' font-size='25'>🌐</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='25' font-size='25'>💻</text></svg>">
 
-    <title>FEEDSHOME – Tu directorio global de feeds</title>
-    <meta name="description" content="FEEDSHOME - Descubre, organiza y sigue tus feeds favoritos en un solo lugar. FEEDSHOME te ofrece un directorio completo de feeds agrupados por idioma, país y categoría, para que estés siempre al día con las noticias, blogs y contenidos que más te interesan, sin perder tiempo buscando." />
-    <meta name="keywords" content="agregadores de noticias,menéame,killbait,tardigram,mediatize,reddit" />
-    <meta name="author" content="FEEDSHOME" />
+    <title>free-for-dev – Discover the best free-tier developer services</title>
+    <meta name="description" content="free-for-dev - Discover, compare, and track the best free developer tools in one place. Our directory brings together software services with free tiers—organized by category, use case, and tech stack—so you can find exactly what you need without wasting time searching.
+" />
+    <meta name="keywords" content="developer-tools, free-tier, free-services, saas-directory, api-directory, software-tools, devtools, programming-resources, developer-resources, web-services, open-source-directory, curated-list, productivity-tools, software-catalog, tech-directory
+" />
+    <meta name="author" content="free-for-dev" />
 
-    <meta property="og:title" content="FEEDSHOME – Tu directorio global de feeds" />
-    <meta property="og:description" content="FEEDSHOME - Descubre, organiza y sigue tus feeds favoritos en un solo lugar. FEEDSHOME te ofrece un directorio completo de feeds agrupados por idioma, país y categoría, para que estés siempre al día con las noticias, blogs y contenidos que más te interesan, sin perder tiempo buscando." />
-    <meta property="og:image" content="https://enterum.github.io/aggrhome/img/image.png" />
-    <meta property="og:url" content="https://enterum.github.io/aggrhome/" />
+    <meta property="og:title" content="free-for-dev – Discover the best free-tier developer services" />
+    <meta property="og:description" content="free-for-dev - Discover, compare, and track the best free developer tools in one place. Our directory brings together software services with free tiers—organized by category, use case, and tech stack—so you can find exactly what you need without wasting time searching.
+" />
+    <meta property="og:image" content="https://marcelomarronedev.github.io/free-for-dev/img/image.png" />
+    <meta property="og:url" content="https://marcelomarronedev.github.io/free-for-dev/" />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="FEEDSHOME" />
+    <meta property="og:site_name" content="free-for-dev" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="FEEDSHOME – Tu directorio global de feeds" />
-    <meta name="twitter:description" content="FEEDSHOME - Descubre, organiza y sigue tus feeds favoritos en un solo lugar. FEEDSHOME te ofrece un directorio completo de feeds agrupados por idioma, país y categoría, para que estés siempre al día con las noticias, blogs y contenidos que más te interesan, sin perder tiempo buscando." />
-    <meta name="twitter:image" content="https://enterum.github.io/aggrhome/img/image.png" />
-    <meta name="twitter:site" content="@aggrhome" />
+    <meta name="twitter:title" content="free-for-dev – Discover the best free-tier developer services" />
+    <meta name="twitter:description" content="free-for-dev - Discover, compare, and track the best free developer tools in one place. Our directory brings together software services with free tiers—organized by category, use case, and tech stack—so you can find exactly what you need without wasting time searching.
+" />
+    <meta name="twitter:image" content="https://marcelomarronedev.github.io/free-for-dev/img/image.png" />
+    <meta name="twitter:site" content="@free_for_dev" />
 
 
 <style>
@@ -69,33 +73,8 @@
 
 <script>
     (function() {
-    
-      const params = new URLSearchParams(window.location.search);
-      const queryLang = params.get("lang");
-    
-      const browserLang = navigator.language || "es-ES";
-      const [langIso, countryIso] = browserLang.split("-");
-    
-      const lang = (queryLang || langIso).substring(0, 2).toLowerCase();
-    
-      const supported = ["es", "en", "fr", "pt", "de", "it"];
-      const finalLang = supported.includes(lang) ? lang : "en";
-    
-      /* Si el navegador trae país -> usarlo, si no -> fallback según idioma
-      const defaultCountry =
-          countryIso ? countryIso.toUpperCase() :
-          finalLang === "es" ? "ES" :
-          finalLang === "en" ? "US" :
-          finalLang.toUpperCase();
-      */
-
-      //Vamos a usar la opción "Todos los países"
-      const defaultCountry = '';
-
-      const defaultCategory = "AGR";
-    
       window.location.href =
-        `index-${finalLang}.html?country=${defaultCountry}&cat=${defaultCategory}`;
+        `index-en.html?country=US&cat=FFD`;
     })();
 </script>
 
@@ -106,8 +85,7 @@
 <div class="noscript-container">
   
   <ul class="lang-list">
-    <li><a class="lang-btn" href="index-en.html?&country=US&cat=AGR">🇺🇸 English</a></li>
-    <li><a class="lang-btn" href="index-es.html?&country=ES&cat=AGR">🇪🇸 Español</a></li>
+    <li><a class="lang-btn" href="index-en.html?&country=US&cat=FFD">🇺🇸 English</a></li>
   </ul>
 </div>
 </noscript>

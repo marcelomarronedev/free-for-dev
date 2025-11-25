@@ -3,25 +3,29 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='25' font-size='25'>🌐</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='25' font-size='25'>💻</text></svg>">
 
-    <title>FEEDSHOME – Your Global Feeds Directory</title>
-    <meta name="description" content="FEEDSHOME - Discover, organize, and follow your favorite feeds in one place. FEEDSHOME offers a complete directory of feeds grouped by language, country, and category so you can stay up to date with the news, blogs, and content that interest you the most, without wasting time searching." />
-    <meta name="keywords" content="news aggregators,menéame,killbait,tardigram,mediatize,reddit" />
-    <meta name="author" content="FEEDSHOME" />
+    <title>free-for-dev – Discover the best free-tier developer services</title>
+    <meta name="description" content="free-for-dev - Discover, compare, and track the best free developer tools in one place. Our directory brings together software services with free tiers—organized by category, use case, and tech stack—so you can find exactly what you need without wasting time searching.
+" />
+    <meta name="keywords" content="developer-tools, free-tier, free-services, saas-directory, api-directory, software-tools, devtools, programming-resources, developer-resources, web-services, open-source-directory, curated-list, productivity-tools, software-catalog, tech-directory
+" />
+    <meta name="author" content="free-for-dev" />
 
-    <meta property="og:title" content="FEEDSHOME – Your Global Feeds Directory" />
-    <meta property="og:description" content="FEEDSHOME - Discover, organize, and follow your favorite feeds in one place. FEEDSHOME offers a complete directory of feeds grouped by language, country, and category so you can stay up to date with the news, blogs, and content that interest you the most, without wasting time searching." />
-    <meta property="og:image" content="https://enterum.github.io/aggrhome/img/image.png" />
-    <meta property="og:url" content="https://enterum.github.io/aggrhome/" />
+    <meta property="og:title" content="free-for-dev – Discover the best free-tier developer services" />
+    <meta property="og:description" content="free-for-dev - Discover, compare, and track the best free developer tools in one place. Our directory brings together software services with free tiers—organized by category, use case, and tech stack—so you can find exactly what you need without wasting time searching.
+" />
+    <meta property="og:image" content="https://marcelomarronedev.github.io/free-for-dev/img/image.png" />
+    <meta property="og:url" content="https://marcelomarronedev.github.io/free-for-dev/" />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="FEEDSHOME" />
+    <meta property="og:site_name" content="free-for-dev" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="FEEDSHOME – Your Global Feeds Directory" />
-    <meta name="twitter:description" content="FEEDSHOME - Discover, organize, and follow your favorite feeds in one place. FEEDSHOME offers a complete directory of feeds grouped by language, country, and category so you can stay up to date with the news, blogs, and content that interest you the most, without wasting time searching." />
-    <meta name="twitter:image" content="https://enterum.github.io/aggrhome/img/image.png" />
-    <meta name="twitter:site" content="@aggrhome" />
+    <meta name="twitter:title" content="free-for-dev – Discover the best free-tier developer services" />
+    <meta name="twitter:description" content="free-for-dev - Discover, compare, and track the best free developer tools in one place. Our directory brings together software services with free tiers—organized by category, use case, and tech stack—so you can find exactly what you need without wasting time searching.
+" />
+    <meta name="twitter:image" content="https://marcelomarronedev.github.io/free-for-dev/img/image.png" />
+    <meta name="twitter:site" content="@free_for_dev" />
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.css" rel="stylesheet">
@@ -54,14 +58,13 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="https://enterum.github.io/aggrhome/">FEEDSHOME 🌐</a>
+          <a class="navbar-brand" href="https://marcelomarronedev.github.io/free-for-dev/">free-for-dev 💻</a>
         </div>
 
 <div class="collapse navbar-collapse navbar-ex1-collapse">
   <ul class="nav navbar-nav">
-    <li><a href="#addfeed">➕ Add</a></li>
     <li><a href="#about">About the Project</a></li>
-    <li><a href="mailto:enterum0@gmail.com">Contact</a></li>
+    <li><a href="mailto:marcelo.raisin606@slmail.me">Contact</a></li>
   </ul>
 
   <form class="navbar-form navbar-right navbar-filters" role="form">
@@ -95,7 +98,7 @@
 
 <div class="container mobile-margin-top">
   <h1 class="page-header">
-    FEEDSHOME 🌐 <small><span id="cattitle"></span></small>
+    free-for-dev 💻 <small><span id="cattitle"></span></small>
     <p id="catsubtitle" style="font-size: 12px; color: #555; margin-top: 5px; font-style: italic;"></p>
   </h1>
 
@@ -109,65 +112,6 @@
 
 </div>
 
-<a id="addfeed"></a>
-<hr>
-<h2 style="margin-top:100px;text-align: center;">Submit a New RSS Feed</h2>
-
-<div class="container" style="margin-bottom: 30px;">
-  <form id="addFeedForm" action="https://enterum.alwaysdata.net/addfeed.php" method="POST" style="max-width: 500px; margin: auto;">
-    <div class="form-group">
-      <label for="rssUrl">RSS Feed URL:</label>
-      <input type="url" class="form-control" id="rssUrl" name="rssUrl" placeholder="https://example.com/feed" required>
-    </div>
-
-    <!-- Hidden fields para idioma, país y categoría -->
-    <input type="hidden" name="language" id="feedLanguage">
-    <input type="hidden" name="country" id="feedCountry">
-    <input type="hidden" name="category" id="feedCategory">
-
-    <div class="form-group" style="text-align:center; margin: 20px 0;">
-      <!-- Google reCAPTCHA v2 -->
-      <div class="g-recaptcha" data-sitekey="6Lfogg0sAAAAAEdEj8BwvttaR5jm1zkI2" data-callback="recaptchaCallback" data-expired-callback="recaptchaExpiredCallback"></div>
-    </div>
-
-    <div class="form-group" style="text-align:center;">
-      <button type="submit" class="btn btn-primary" id="submitFeedBtn" disabled>Add Feed</button>
-    </div>
-  </form>
-</div>
-
-<!-- Google reCAPTCHA -->
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
-<script src="https://www.google.com/recaptcha/api.js?render=6LdP1BMsAAAAAPuXgNBE_5pJ2WQjc8VafD_A6IMw"></script>
-
-<script>
-  // Habilita el botón cuando el reCAPTCHA está validado
-  function recaptchaCallback() {
-    const btn = document.getElementById('submitFeedBtn');
-    if (btn) btn.disabled = false;
-  }
-
-  function recaptchaExpiredCallback() {
-    const btn = document.getElementById('submitFeedBtn');
-    if (btn) btn.disabled = true;
-  }
-
-  // Antes de enviar el formulario, rellena los campos ocultos
-  const addFeedForm = document.getElementById('addFeedForm');
-  addFeedForm.addEventListener('submit', function(e) {
-    const langSelect = document.getElementById('languageSelect');
-    const countrySelect = document.getElementById('countrySelect');
-    const categorySelect = document.getElementById('categorySelect');
-
-    if (langSelect && countrySelect && categorySelect) {
-      document.getElementById('feedLanguage').value = langSelect.value;
-      document.getElementById('feedCountry').value = countrySelect.value;
-      document.getElementById('feedCategory').value = categorySelect.value;
-    }
-  });
-</script>
-
-
 
 <a name="about"></a>
 <hr>
@@ -180,7 +124,7 @@
 <script>
   async function loadReadme() {
     try {
-      const response = await fetch('https://raw.githubusercontent.com/enterum/aggrhome/refs/heads/main/README.md', { cache: "no-store" });
+      const response = await fetch('https://raw.githubusercontent.com/marcelomarronedev/free-for-dev/refs/heads/main/README.md', { cache: "no-store" });
       if (!response.ok) throw new Error('Could not load README');
       const markdown = await response.text();
       
@@ -204,10 +148,12 @@
   <footer>
     <div class="row">
       <div class="col-lg-12">
-        <p>&copy; AGGRHOME <span id="getCurrentDate"></span> 
-          - Code and website hosted on - <a target="_blank" href="https://github.com/enterum/aggrhome">Github</a>
+        <p>&copy; free-for-dev <span id="getCurrentDate"></span> 
+          - Code and static website hosted on - <a target="_blank" href="https://github.com/marcelomarronedev/free-for-dev">Github</a>
           - HTML template by <a target="_blank" href="https://github.com/learning-zone/website-templates/tree/master/3-col-portfolio">3-col-portfolio</a>
-          - CORS proxy by <a target="_blank" href="https://corsproxy.io/">corsproxy.io</a> - Comment system by <a target="_blank" href="https://utteranc.es/">utteranc.es</a> 
+          - CORS proxy by <a target="_blank" href="https://corsproxy.io/">corsproxy.io</a> 
+          - Comment system by <a target="_blank" href="https://utteranc.es/">utteranc.es</a> 
+          - Other free web hosting features: <a href="https://rebuscando.info" target="_blank">Rebuscando.INFO</a> and <a href="https://alwaysdata.net" target="_blank">Alwaysdata.NET<a>.
         </p>
       </div>
     </div>

@@ -93,11 +93,11 @@ function loadFeeds() {
             const loading = document.getElementById("loading-container");
             if (loading)
                 loading.style.display = "block"; // mostrar spinner
-            const feedsTxt = yield fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
+            const feedsTxt = yield fetch("https://free-for-dev.alwaysdata.net/feeds.txt", { cache: "no-store" }).then(res => res.text());
             const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
             let votesData = [];
             try {
-                const votesResponse = yield fetch(`https://enterum.alwaysdata.net/getvotes.php?language=${encodeURIComponent(selectedLanguage)}&cat=${encodeURIComponent(selectedCategory)}&country=${encodeURIComponent(selectedCountry)}&nocache=` + Date.now(), {
+                const votesResponse = yield fetch(`https://free-for-dev.alwaysdata.net/getvotes.php?language=${encodeURIComponent(selectedLanguage)}&cat=${encodeURIComponent(selectedCategory)}&country=${encodeURIComponent(selectedCountry)}&nocache=` + Date.now(), {
                     cache: "no-store"
                 });
                 if (votesResponse.ok) {
@@ -153,7 +153,7 @@ function loadFeeds() {
                     colDiv.className = "col-md-4 portfolio-item";
                     colDiv.setAttribute("data-feed", String(j));
                     colDiv.innerHTML = `
-        <a target="_blank" href="#"><img class="img-responsive" src="#"></a>
+        <a target="_blank" href="#"><img class="img-responsive" src="#" onerror="this.onerror=null; this.src='https://marcelomarronedev.github.io/free-for-dev/img/logo.png';"></a>
         <h3>${feed.title} <span class="votes-count" style="font-size:14px; color:gray;">(${feed.votes} votos)</span></h3>
         <p><a target="_blank" href="##">...</a></p>
         <p class="pubdate"></p>
@@ -165,7 +165,7 @@ function loadFeeds() {
             const items = yield Promise.all(feedsWithImages.map(feed => getFirstItem(feed.url, feed.type, feed.useDescriptionForImage)));
             // Actualizar contenido de cada feed
             items.forEach((feedItem, index) => {
-                var _a, _b;
+                var _a;
                 const container = document.querySelector(`.portfolio-item[data-feed="${index}"]`);
                 if (!container)
                     return;
@@ -178,7 +178,7 @@ function loadFeeds() {
                     if (linkEl)
                         linkEl.href = "#";
                     if (imgEl)
-                        imgEl.src = "http://enterum.github.io/aggrhome/img/carta-ajuste.png";
+                        imgEl.src = "https://github.com/marcelomarronedev/free-for-dev/img/carta-ajuste.png";
                     if (titleEl) {
                         titleEl.textContent = t("feedTechnicalIssues");
                         titleEl.href = "#";
@@ -222,7 +222,6 @@ function loadFeeds() {
                 commentsDiv.style.border = "1px solid #ccc";
                 commentsDiv.style.padding = "10px";
                 commentsDiv.style.borderRadius = "8px";
-                const issueTerm = getCommentsIssueTerm(feed.title, feed.category, window.PAGE_LANG || "en");
                 commentsToggle.addEventListener("click", (e) => {
                     e.preventDefault();
                     if (commentsDiv.style.display === "none") {
@@ -232,8 +231,8 @@ function loadFeeds() {
                             const script = document.createElement("script");
                             script.src = "https://utteranc.es/client.js";
                             script.async = true;
-                            script.setAttribute("repo", "enterum/feeds-comments");
-                            script.setAttribute("issue-term", issueTerm);
+                            script.setAttribute("repo", "marcelomarronedev/free-for-dev");
+                            script.setAttribute("issue-term", feed.title);
                             script.setAttribute("theme", "github-light");
                             script.setAttribute("crossorigin", "anonymous");
                             commentsDiv.appendChild(script);
@@ -272,7 +271,7 @@ function loadFeeds() {
                                     return;
                                 }
                                 window.grecaptcha.ready(() => {
-                                    window.grecaptcha.execute("6LdP1BMsAAAAAPuXgNBE_5pJ2WQjc8VafD_A6IMw", { action: "vote" }).then((token) => {
+                                    window.grecaptcha.execute("6LfbFhcsAAAAACjeQU-G9iCrhhOFi_U02Pt_3xNt", { action: "vote" }).then((token) => {
                                         if (token)
                                             resolve(token);
                                         else
@@ -283,7 +282,7 @@ function loadFeeds() {
                             const language = document.getElementById("languageSelect").value;
                             const category = document.getElementById("categorySelect").value;
                             const country = document.getElementById("countrySelect").value;
-                            const response = yield fetch('https://enterum.alwaysdata.net/vote.php', {
+                            const response = yield fetch('https://free-for-dev.alwaysdata.net/vote.php', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                                 body: new URLSearchParams({
@@ -325,248 +324,13 @@ function loadFeeds() {
                         }
                     }));
                 }
-                const h3El = container.querySelector("h3");
-                if (h3El) {
-                    const emoji = ((_b = h3El.textContent) === null || _b === void 0 ? void 0 : _b.includes("🕒")) ? h3El.querySelector("span") : null;
-                    let emojiEl;
-                    if (!emoji) {
-                        emojiEl = document.createElement("span");
-                        emojiEl.style.cursor = "pointer";
-                        emojiEl.style.marginLeft = "5px";
-                        emojiEl.textContent = "🕒";
-                        emojiEl.title = t("viewHistory");
-                        h3El.appendChild(emojiEl);
-                    }
-                    else {
-                        emojiEl = emoji;
-                    }
-                    let emojiShare = h3El.querySelector(".share");
-                    if (!emojiShare) {
-                        emojiShare = document.createElement("span");
-                        emojiShare.className = "share";
-                        emojiShare.style.cursor = "pointer";
-                        emojiShare.style.marginLeft = "5px";
-                        emojiShare.textContent = "🔗";
-                        emojiShare.title = t("sharethisnews");
-                        h3El.appendChild(emojiShare);
-                        emojiShare.addEventListener("click", () => {
-                            if (!navigator.share) {
-                                Swal.fire({
-                                    icon: "warning",
-                                    title: "Ups!",
-                                    text: t("shareFailed"),
-                                });
-                                return;
-                            }
-                            navigator.share({
-                                title: feed.title, // nombre del feed
-                                text: feedItem.title, // titular de la noticia
-                                url: feedItem.link, // url de la noticia
-                            })
-                                .then(() => console.log("shared!")) //lo vamos a dejar como aviso en la consola, no tiene mucho sentido sacar un Swal aquí
-                                .catch((error) => Swal.fire({
-                                icon: "error",
-                                title: "Ups!",
-                                text: t("shareError"),
-                            }));
-                        });
-                    }
-                    emojiEl.addEventListener("click", () => {
-                        const historyContainer = document.getElementById("history-container");
-                        if (!historyContainer)
-                            return;
-                        // Limpiar contenido previo
-                        historyContainer.innerHTML = "";
-                        try {
-                            const storedDataJson = localStorage.getItem("feedsHistory");
-                            let storedData = storedDataJson ? JSON.parse(storedDataJson) : [];
-                            const urlObj = new URL(feedItem.link);
-                            const host = urlObj.host;
-                            const filtered = storedData.filter(item => item.host === host);
-                            filtered.sort((a, b) => (a.pubDate < b.pubDate ? 1 : a.pubDate > b.pubDate ? -1 : 0));
-                            const h3 = document.createElement("h3");
-                            h3.textContent = t("historyTitle") + " " + feed.title + ":";
-                            h3.style.textAlign = "center";
-                            h3.style.marginBottom = "20px";
-                            historyContainer.appendChild(h3);
-                            const table = document.createElement("table");
-                            table.style.width = "100%";
-                            table.style.borderCollapse = "collapse";
-                            filtered.forEach(item => {
-                                const tr = document.createElement("tr");
-                                tr.style.borderBottom = "1px solid #ccc";
-                                tr.style.padding = "5px";
-                                tr.style.paddingBottom = "10px";
-                                const tdImg = document.createElement("td");
-                                tdImg.style.width = "100px";
-                                const img = document.createElement("img");
-                                img.src = item.imageUrl;
-                                img.style.maxHeight = "100px";
-                                img.style.width = "100%";
-                                img.style.height = "100px";
-                                img.style.objectFit = "cover";
-                                img.style.borderRadius = "12px";
-                                img.style.display = "block";
-                                img.style.border = "1px solid #ddd";
-                                img.style.marginRight = "20px";
-                                tdImg.appendChild(img);
-                                const tdTitle = document.createElement("td");
-                                tdTitle.style.paddingLeft = "20px";
-                                const a = document.createElement("a");
-                                a.href = item.link;
-                                a.target = "_blank";
-                                a.style.fontSize = "17px";
-                                a.textContent = item.title;
-                                tdTitle.appendChild(a);
-                                const tdDate = document.createElement("td");
-                                tdDate.textContent = item.pubDate;
-                                tr.appendChild(tdImg);
-                                tr.appendChild(tdTitle);
-                                tr.appendChild(tdDate);
-                                table.appendChild(tr);
-                            });
-                            historyContainer.appendChild(table);
-                            historyContainer.style.display = "block";
-                            const rect = historyContainer.getBoundingClientRect();
-                            const scrollTop = window.scrollY + rect.top - 100;
-                            window.scrollTo({ top: scrollTop, behavior: "smooth" });
-                        }
-                        catch (err) {
-                            console.error("Error showing history:", err);
-                        }
-                    });
-                }
             });
             if (loading)
                 loading.style.display = "none";
             container.style.display = "block";
-            saveHistorial(true, 5);
         }
         catch (error) {
             console.error("Error reading feeds.txt or updating DOM:", error);
-        }
-    });
-}
-function saveHistorial() {
-    return __awaiter(this, arguments, void 0, function* (useDescriptionForImage = false, maxConcurrent = 5) {
-        var _a, _b, _c;
-        try {
-            const selectedCategory = (_a = document.getElementById("categorySelect")) === null || _a === void 0 ? void 0 : _a.value;
-            const selectedCountry = (_b = document.getElementById("countrySelect")) === null || _b === void 0 ? void 0 : _b.value;
-            const selectedLanguage = (_c = document.getElementById("languageSelect")) === null || _c === void 0 ? void 0 : _c.value;
-            const feedsTxt = yield fetch("feeds.txt", { cache: "no-store" }).then(res => res.text());
-            const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line && !line.startsWith("#"));
-            const feeds = lines.map(line => {
-                var _a, _b, _c, _d, _e;
-                const parts = line.split(",");
-                return {
-                    title: (_a = parts[0]) === null || _a === void 0 ? void 0 : _a.trim(),
-                    url: (_b = parts[1]) === null || _b === void 0 ? void 0 : _b.trim(),
-                    defaultImage: ((_c = parts[2]) === null || _c === void 0 ? void 0 : _c.trim()) || "",
-                    type: (((_d = parts[3]) === null || _d === void 0 ? void 0 : _d.trim()) || "rss").toLowerCase(),
-                    useDescriptionForImage: (((_e = parts[4]) === null || _e === void 0 ? void 0 : _e.trim().toLowerCase()) === "true"),
-                    category: parts[5],
-                    country: parts[6],
-                    language: parts[7]
-                };
-            });
-            const storedDataJson = localStorage.getItem("feedsHistory");
-            let storedData = storedDataJson ? JSON.parse(storedDataJson) : [];
-            // Pool de concurrencia
-            let active = 0;
-            let index = 0;
-            return new Promise((resolve) => {
-                const next = () => __awaiter(this, void 0, void 0, function* () {
-                    if (index >= feeds.length) {
-                        if (active === 0) {
-                            localStorage.setItem("feedsHistory", JSON.stringify(storedData));
-                            resolve();
-                        }
-                        return;
-                    }
-                    while (active < maxConcurrent && index < feeds.length) {
-                        const feed = feeds[index++];
-                        active++;
-                        (() => __awaiter(this, void 0, void 0, function* () {
-                            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
-                            try {
-                                if (feed.language == selectedLanguage && feed.category === selectedCategory && (selectedCountry === "" || feed.country === selectedCountry)) {
-                                    const response = yield fetchWithTimeout(`https://corsproxy.io/?${encodeURIComponent(feed.url)}`, { cache: "no-store" });
-                                    const xmlText = yield response.text();
-                                    const parser = new DOMParser();
-                                    const xml = parser.parseFromString(xmlText, "application/xml");
-                                    const isAtom = feed.type === "atom";
-                                    const items = isAtom ? Array.from(xml.querySelectorAll("entry")) : Array.from(xml.querySelectorAll("item"));
-                                    for (const item of items) {
-                                        const title = (_b = (_a = item.querySelector("title")) === null || _a === void 0 ? void 0 : _a.textContent) !== null && _b !== void 0 ? _b : "";
-                                        let link = "";
-                                        if (isAtom)
-                                            link = (_d = (_c = item.querySelector("link")) === null || _c === void 0 ? void 0 : _c.getAttribute("href")) !== null && _d !== void 0 ? _d : "";
-                                        else
-                                            link = (_f = (_e = item.querySelector("link")) === null || _e === void 0 ? void 0 : _e.textContent) !== null && _f !== void 0 ? _f : "";
-                                        if (!link)
-                                            continue;
-                                        let imageUrl = "";
-                                        if (isAtom) {
-                                            const content = (_h = (_g = item.querySelector("content")) === null || _g === void 0 ? void 0 : _g.textContent) !== null && _h !== void 0 ? _h : "";
-                                            const imgMatch = content.match(/<img[^>]+src=['"]([^'"]+)['"]/);
-                                            if (imgMatch)
-                                                imageUrl = imgMatch[1];
-                                        }
-                                        else {
-                                            const media = item.querySelector("media\\:content, enclosure");
-                                            if (media)
-                                                imageUrl = (_j = media.getAttribute("url")) !== null && _j !== void 0 ? _j : "";
-                                        }
-                                        if (!imageUrl && useDescriptionForImage) {
-                                            const description = (_l = (_k = item.querySelector("description")) === null || _k === void 0 ? void 0 : _k.textContent) !== null && _l !== void 0 ? _l : "";
-                                            const match = description.match(/<img[^>]+src=['"]([^'"]+)['"]/);
-                                            if (match)
-                                                imageUrl = match[1];
-                                        }
-                                        let pubDate = "";
-                                        if (isAtom) {
-                                            const updatedRaw = (_o = (_m = item.querySelector("updated")) === null || _m === void 0 ? void 0 : _m.textContent) !== null && _o !== void 0 ? _o : "";
-                                            if (updatedRaw)
-                                                pubDate = formatDate(new Date(updatedRaw));
-                                        }
-                                        else {
-                                            const pubDateRaw = (_q = (_p = item.querySelector("pubDate")) === null || _p === void 0 ? void 0 : _p.textContent) !== null && _q !== void 0 ? _q : "";
-                                            const pubDateObj = pubDateRaw ? new Date(pubDateRaw) : null;
-                                            pubDate = pubDateObj ? formatDate(pubDateObj) : "";
-                                        }
-                                        try {
-                                            const urlObj = new URL(link);
-                                            const host = urlObj.host;
-                                            const exists = storedData.some(i => i.link === link);
-                                            if (exists)
-                                                continue;
-                                            const esValida = yield validarImagen(imageUrl);
-                                            if (!esValida)
-                                                imageUrl = feed.defaultImage || "";
-                                            storedData.push({ host, title, link, imageUrl, pubDate, type: feed.type, fromDescription: feed.useDescriptionForImage });
-                                        }
-                                        catch (err) {
-                                            console.error("Error saving item in localStorage:", err);
-                                        }
-                                    }
-                                }
-                            }
-                            catch (err) {
-                                console.error("Error processing feed:", feed.url, err);
-                            }
-                            finally {
-                                active--;
-                                next(); // Lanza la siguiente tarea
-                            }
-                        }))();
-                    }
-                });
-                next();
-            });
-        }
-        catch (err) {
-            console.error("Error general in saveHistorial:", err);
         }
     });
 }
@@ -678,7 +442,7 @@ function loadCategories() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const PAGE_LANG = window.PAGE_LANG || "en";
-            const response = yield fetch("categories.txt", { cache: "no-store" });
+            const response = yield fetch("https://free-for-dev.alwaysdata.net/categories.txt", { cache: "no-store" });
             const text = yield response.text();
             const lines = text
                 .split("\n")
@@ -879,11 +643,4 @@ function t(key) {
     if (!i18n[lang])
         return key;
     return (_a = i18n[lang][key]) !== null && _a !== void 0 ? _a : key;
-}
-function getCommentsIssueTerm(feedTitle, category, lang) {
-    // Si es español y agregadores, dejamos solo el título (manteniendo compatibilidad con los comentarios existentes)
-    if (lang === "es" && category === 'AGR')
-        return feedTitle;
-    // Para otros idiomas, añadimos categoría y código de idioma
-    return `${feedTitle}-${category}-${lang}`;
 }
