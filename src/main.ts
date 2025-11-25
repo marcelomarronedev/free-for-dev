@@ -128,7 +128,7 @@ async function loadFeeds() {
     if (loading) loading.style.display = "block"; // mostrar spinner
     
    
-    const feedsTxt = await fetch("https://free-for-dev.alwaysdata.net/feeds.txt", { cache: "no-store" }).then(res => res.text());
+    const feedsTxt = await fetchWithTimeout("https://corsproxy.io/?https://free-for-dev.alwaysdata.net/feeds.txt", { cache: "no-store" }).then(res => res.text());
     const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
 
     let votesData: Array<{ feed: string; votes: number }> = [];
@@ -469,55 +469,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  const form = document.getElementById("addFeedForm") as HTMLFormElement;
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const submitBtn = document.getElementById("submitFeedBtn") as HTMLButtonElement;
-    submitBtn.disabled = true;
-
-    try {
-      const formData = new FormData(form);
-      
-      const response = await fetch(form.action, {
-        method: "POST",
-        body: formData
-      });
-
-      const status = response.status;
-      let json = null;
-
-      if (response.headers.get("content-type")?.includes("application/json")) {
-        json = await response.json();
-      }
-
-      if (response.ok) {
-        Swal.fire({
-          icon: "success",
-          title: "Ok!",
-          text: t("addFeedSuccess"),
-        });
-      } 
-      else {
-        Swal.fire({
-          icon: "error",
-          title: "Ups!",
-          text: t("addFeedError"),
-        });
-      }
-
-    } catch (error) {
-      console.error(t("connectionError"), error);
-      Swal.fire({
-        icon: "error",
-        title: "Ups!",
-        text: t("connectionError"),
-      });
-    } finally {
-      submitBtn.disabled = false;
-    }
-  });
 
 
 
@@ -540,7 +491,7 @@ async function loadCategories() {
   try {
     const PAGE_LANG = (window as any).PAGE_LANG || "en";
 
-    const response = await fetch("https://free-for-dev.alwaysdata.net/categories.txt", { cache: "no-store" });
+    const response = await fetchWithTimeout("https://corsproxy.io/?https://free-for-dev.alwaysdata.net/categories.txt", { cache: "no-store" });
     const text = await response.text();
 
     const lines = text

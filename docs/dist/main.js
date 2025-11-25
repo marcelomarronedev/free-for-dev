@@ -93,7 +93,7 @@ function loadFeeds() {
             const loading = document.getElementById("loading-container");
             if (loading)
                 loading.style.display = "block"; // mostrar spinner
-            const feedsTxt = yield fetch("https://free-for-dev.alwaysdata.net/feeds.txt", { cache: "no-store" }).then(res => res.text());
+            const feedsTxt = yield fetchWithTimeout("https://corsproxy.io/?https://free-for-dev.alwaysdata.net/feeds.txt", { cache: "no-store" }).then(res => res.text());
             const lines = feedsTxt.split("\n").map(line => line.trim()).filter(line => line);
             let votesData = [];
             try {
@@ -380,50 +380,6 @@ document.addEventListener("DOMContentLoaded", () => {
     else {
         console.error("No refresh select found");
     }
-    const form = document.getElementById("addFeedForm");
-    form.addEventListener("submit", (event) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
-        event.preventDefault();
-        const submitBtn = document.getElementById("submitFeedBtn");
-        submitBtn.disabled = true;
-        try {
-            const formData = new FormData(form);
-            const response = yield fetch(form.action, {
-                method: "POST",
-                body: formData
-            });
-            const status = response.status;
-            let json = null;
-            if ((_a = response.headers.get("content-type")) === null || _a === void 0 ? void 0 : _a.includes("application/json")) {
-                json = yield response.json();
-            }
-            if (response.ok) {
-                Swal.fire({
-                    icon: "success",
-                    title: "Ok!",
-                    text: t("addFeedSuccess"),
-                });
-            }
-            else {
-                Swal.fire({
-                    icon: "error",
-                    title: "Ups!",
-                    text: t("addFeedError"),
-                });
-            }
-        }
-        catch (error) {
-            console.error(t("connectionError"), error);
-            Swal.fire({
-                icon: "error",
-                title: "Ups!",
-                text: t("connectionError"),
-            });
-        }
-        finally {
-            submitBtn.disabled = false;
-        }
-    }));
 });
 function fetchWithTimeout(url_1) {
     return __awaiter(this, arguments, void 0, function* (url, options = {}, timeoutMs = 3000) {
@@ -442,7 +398,7 @@ function loadCategories() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const PAGE_LANG = window.PAGE_LANG || "en";
-            const response = yield fetch("https://free-for-dev.alwaysdata.net/categories.txt", { cache: "no-store" });
+            const response = yield fetchWithTimeout("https://corsproxy.io/?https://free-for-dev.alwaysdata.net/categories.txt", { cache: "no-store" });
             const text = yield response.text();
             const lines = text
                 .split("\n")
