@@ -485,10 +485,14 @@ document.addEventListener("DOMContentLoaded", () => {
     link.addEventListener("click", closeNavbar);
   });
 
-  const categorySelect = document.getElementById("categorySelect");
-  if (categorySelect) {
-    categorySelect.addEventListener("change", closeNavbar);
-  }
+  const categorySelect = document.getElementById("categorySelect") as HTMLSelectElement | null;
+  categorySelect?.addEventListener("change", () => {
+    closeNavbar();
+    window.scrollTo({ top: 0, behavior: "smooth" }); 
+  });
+
+
+  
 });
 
 const i18n = {

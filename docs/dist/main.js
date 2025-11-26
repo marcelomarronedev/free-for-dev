@@ -425,9 +425,10 @@ document.addEventListener("DOMContentLoaded", () => {
         link.addEventListener("click", closeNavbar);
     });
     const categorySelect = document.getElementById("categorySelect");
-    if (categorySelect) {
-        categorySelect.addEventListener("change", closeNavbar);
-    }
+    categorySelect === null || categorySelect === void 0 ? void 0 : categorySelect.addEventListener("change", () => {
+        closeNavbar();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
 });
 const i18n = {
     en: {
