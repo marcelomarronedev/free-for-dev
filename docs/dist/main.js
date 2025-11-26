@@ -346,7 +346,7 @@ function initFeedsModule() {
                 const votesMap = yield fetchVotes(selectedFeed.code);
                 items.forEach(item => {
                     var _a;
-                    const key = item.title.trim().toLowerCase();
+                    const key = item.link.trim().toLowerCase();
                     item.votes = (_a = votesMap[key]) !== null && _a !== void 0 ? _a : 0;
                 });
                 items.sort((a, b) => { var _a, _b; return ((_a = b.votes) !== null && _a !== void 0 ? _a : 0) - ((_b = a.votes) !== null && _b !== void 0 ? _b : 0); });

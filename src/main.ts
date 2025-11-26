@@ -391,7 +391,7 @@ async function initFeedsModule() {
       const votesMap = await fetchVotes(selectedFeed.code);
 
       items.forEach(item => {
-        const key = item.title.trim().toLowerCase();
+        const key = item.link.trim().toLowerCase();
         (item as any).votes = votesMap[key] ?? 0;
       });
       items.sort((a, b) => (b.votes ?? 0) - (a.votes ?? 0));
