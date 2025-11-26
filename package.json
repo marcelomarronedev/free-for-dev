@@ -1,7 +1,7 @@
 {
   "name": "free-for-dev",
   "version": "1.0.0",
-  "description": "free-for-dev – Your Global Feeds Directory",
+  "description": "free-for-dev – Discover the best free-tier developer services",
   "main": "dist/main.js",
   "scripts": {
     "clean": "rimraf docs/dist",

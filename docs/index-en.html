@@ -68,27 +68,21 @@
   </ul>
 
   <form class="navbar-form navbar-right navbar-filters" role="form">
-    <div class="form-group">
+    <div  style="display: none;" class="form-group">
       <select id="languageSelect" class="form-control input-sm">
+        <option value="en">English</option>
       </select>
     </div>
     <div class="form-group">
       <select id="categorySelect" class="form-control input-sm">
       </select>
     </div>
-    <div class="form-group">
+    <div  style="display: none;" class="form-group">
       <select id="countrySelect" class="form-control input-sm">
+        <option value="US">United States</option>
       </select>
     </div>
-    <div class="form-group">
-      <select id="refreshSelect" class="form-control input-sm">
-        <option value="0">Never refresh</option>
-        <option value="60000">Refresh every minute</option>
-        <option value="300000" selected>Refresh every 5 minutes</option>
-        <option value="600000">Refresh every 10 minutes</option>
-        <option value="1800000">Refresh every 30 minutes</option>
-      </select>
-    </div>
+    
   </form>
   
 </div><!-- /.navbar-collapse -->
@@ -98,16 +92,15 @@
 
 <div class="container mobile-margin-top">
   <h1 class="page-header">
-    free-for-dev 💻 <small><span id="cattitle"></span></small>
-    <p id="catsubtitle" style="font-size: 12px; color: #555; margin-top: 5px; font-style: italic;"></p>
+    free-for-dev 💻 <small><span id="cattitle">Free resources for developers:</span></small>
+    <p id="catsubtitle" style="font-size: 12px; color: #555; margin-top: 5px; font-style: italic;">Rate each resource based on how useful you think it is: The number of votes will determine the order in the list.</p>
   </h1>
 
-  <div style="display:none" id="feeds-container"></div>
-  <div style="display:none" id="history-container"></div>
+  <div style="display:none" id="feeds-container" class="container"></div>
 
   <div id="loading-container" style="text-align:center; margin: 20px 0;">
     <img src="img/loading.gif" alt="Loading..." id="loading-spinner" style="width: 50px; height: 50px;">
-    <p>Loading feeds...</p>
+    <p>Loading free resources...</p>
   </div>
 
 </div>
