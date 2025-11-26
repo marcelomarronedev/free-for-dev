@@ -72,10 +72,11 @@
 </style>
 
 <script>
-    (function() {
-      window.location.href =
-        `index-en.html?country=US&cat=046`;
-    })();
+  (function() {
+    const randomNum = Math.floor(Math.random() * 61) + 1;
+    const catValue = String(randomNum).padStart(3, '0');
+    window.location.href = `index-en.html?cat=${catValue}`;
+  })();
 </script>
 
 </head>
@@ -85,7 +86,7 @@
 <div class="noscript-container">
   
   <ul class="lang-list">
-    <li><a class="lang-btn" href="index-en.html?&country=US&cat=046">🇺🇸 English</a></li>
+    <li><a class="lang-btn" href="index-en.html?cat=046">🇺🇸 English</a></li>
   </ul>
 </div>
 </noscript>
