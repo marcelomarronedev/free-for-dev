@@ -158,7 +158,7 @@ function renderItemsGrid(items: FeedItem[], defaultImage: string, container: HTM
     
     const img = document.createElement("img");
     img.alt = item.title ?? "";
-    img.src = defaultImage || "https://marcelomarronedev.github.io/free-for-dev/img/logo.png";
+    img.src = defaultImage || "https://free-for-dev.rebuscando.info/img/logo.png";
     
     img.style.borderRadius = "8px";
     img.style.border = "1px solid #ccc";
@@ -173,12 +173,12 @@ function renderItemsGrid(items: FeedItem[], defaultImage: string, container: HTM
         const candidate = item.imageUrl ?? "";
         if (candidate) {
           const ok = await validarImagen(candidate);
-          img.src = ok ? candidate : (defaultImage || "https://marcelomarronedev.github.io/free-for-dev/img/logo.png");
+          img.src = ok ? candidate : (defaultImage || "https://free-for-dev.rebuscando.info/img/logo.png");
         } else {
-          img.src = defaultImage || "https://marcelomarronedev.github.io/free-for-dev/img/logo.png";
+          img.src = defaultImage || "https://free-for-dev.rebuscando.info/img/logo.png";
         }
       } catch (e) {
-        img.src = defaultImage || "https://marcelomarronedev.github.io/free-for-dev/img/logo.png";
+        img.src = defaultImage || "https://free-for-dev.rebuscando.info/img/logo.png";
       }
     })();
     

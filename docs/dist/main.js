@@ -141,7 +141,7 @@ function renderItemsGrid(items, defaultImage, container, selectedFeeed) {
         imgLink.rel = "noopener noreferrer";
         const img = document.createElement("img");
         img.alt = (_a = item.title) !== null && _a !== void 0 ? _a : "";
-        img.src = defaultImage || "https://marcelomarronedev.github.io/free-for-dev/img/logo.png";
+        img.src = defaultImage || "https://free-for-dev.rebuscando.info/img/logo.png";
         img.style.borderRadius = "8px";
         img.style.border = "1px solid #ccc";
         img.style.height = "200px";
@@ -154,14 +154,14 @@ function renderItemsGrid(items, defaultImage, container, selectedFeeed) {
                 const candidate = (_a = item.imageUrl) !== null && _a !== void 0 ? _a : "";
                 if (candidate) {
                     const ok = yield validarImagen(candidate);
-                    img.src = ok ? candidate : (defaultImage || "https://marcelomarronedev.github.io/free-for-dev/img/logo.png");
+                    img.src = ok ? candidate : (defaultImage || "https://free-for-dev.rebuscando.info/img/logo.png");
                 }
                 else {
-                    img.src = defaultImage || "https://marcelomarronedev.github.io/free-for-dev/img/logo.png";
+                    img.src = defaultImage || "https://free-for-dev.rebuscando.info/img/logo.png";
                 }
             }
             catch (e) {
-                img.src = defaultImage || "https://marcelomarronedev.github.io/free-for-dev/img/logo.png";
+                img.src = defaultImage || "https://free-for-dev.rebuscando.info/img/logo.png";
             }
         }))();
         card.appendChild(imgLink);
