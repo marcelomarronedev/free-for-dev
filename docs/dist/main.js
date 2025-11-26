@@ -206,7 +206,7 @@ function renderItemsGrid(items, defaultImage, container, selectedFeeed) {
                     method: "POST",
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                     body: new URLSearchParams({
-                        feed: selectedFeeed.url,
+                        feed: item.link,
                         cat: category,
                         captchatoken: token
                     })
@@ -446,7 +446,6 @@ function fetchVotes(categoryCode) {
                 return {};
             }
             const votesData = yield resp.json();
-            // Convertimos a diccionario para acceso rápido
             const votesMap = {};
             votesData.forEach(v => {
                 votesMap[v.feed.trim().toLowerCase()] = v.votes;
