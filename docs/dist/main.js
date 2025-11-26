@@ -410,6 +410,24 @@ function initFeedsModule() {
 }
 document.addEventListener("DOMContentLoaded", () => {
     initFeedsModule();
+    //Collapsable menu
+    const navbarCollapse = document.querySelector(".navbar-ex1-collapse");
+    function closeNavbar() {
+        if (navbarCollapse && navbarCollapse.classList.contains("in")) {
+            const toggleButton = document.querySelector(".navbar-toggle");
+            ;
+            if (toggleButton)
+                toggleButton.click();
+        }
+    }
+    const navLinks = document.querySelectorAll(".navbar-ex1-collapse a");
+    navLinks.forEach(link => {
+        link.addEventListener("click", closeNavbar);
+    });
+    const categorySelect = document.getElementById("categorySelect");
+    if (categorySelect) {
+        categorySelect.addEventListener("change", closeNavbar);
+    }
 });
 const i18n = {
     en: {
