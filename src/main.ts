@@ -234,7 +234,7 @@ function renderItemsGrid(items: FeedItem[], defaultImage: string, container: HTM
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: new URLSearchParams({
-            feed: selectedFeeed.url,
+            feed: item.link,
             cat: category,
             captchatoken: token
           })
@@ -506,7 +506,6 @@ async function fetchVotes(categoryCode: string): Promise<Record<string, number>>
       return {};
     }
     const votesData: Array<{ feed: string; votes: number }> = await resp.json();
-    // Convertimos a diccionario para acceso rápido
     const votesMap: Record<string, number> = {};
     votesData.forEach(v => {
       votesMap[v.feed.trim().toLowerCase()] = v.votes;
