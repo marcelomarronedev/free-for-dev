@@ -337,6 +337,7 @@ function initFeedsModule() {
             const feeds = yield fetchFeedsList();
             selectEl.innerHTML = "";
             feeds.forEach(feed => selectEl.appendChild(makeSelectOption(feed)));
+            sortCategorySelect(selectEl);
             const defaultCat = getSelectedCatFromUrl();
             let selectedCat = feeds.some(f => f.code === defaultCat) ? defaultCat : ((_b = (_a = feeds[0]) === null || _a === void 0 ? void 0 : _a.code) !== null && _b !== void 0 ? _b : "001");
             selectEl.value = selectedCat;
@@ -476,4 +477,12 @@ function fetchVotes(categoryCode) {
             return {};
         }
     });
+}
+function sortCategorySelect(selectEl) {
+    const selectedValue = selectEl.value;
+    const optionsArray = Array.from(selectEl.options);
+    optionsArray.sort((a, b) => a.text.localeCompare(b.text));
+    selectEl.innerHTML = "";
+    optionsArray.forEach(opt => selectEl.appendChild(opt));
+    selectEl.value = selectedValue;
 }

@@ -378,6 +378,7 @@ async function initFeedsModule() {
 
     selectEl.innerHTML = "";
     feeds.forEach(feed => selectEl.appendChild(makeSelectOption(feed)));
+    sortCategorySelect(selectEl);
 
     const defaultCat = getSelectedCatFromUrl();
     let selectedCat = feeds.some(f => f.code === defaultCat) ? defaultCat : (feeds[0]?.code ?? "001");
@@ -539,4 +540,17 @@ async function fetchVotes(categoryCode: string): Promise<Record<string, number>>
     console.error("Error getting votes:", err);
     return {};
   }
+}
+
+function sortCategorySelect(selectEl: HTMLSelectElement) {
+  const selectedValue = selectEl.value; 
+
+  const optionsArray = Array.from(selectEl.options);
+
+  optionsArray.sort((a, b) => a.text.localeCompare(b.text));
+
+  selectEl.innerHTML = "";
+  optionsArray.forEach(opt => selectEl.appendChild(opt));
+
+  selectEl.value = selectedValue;
 }
